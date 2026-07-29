@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Alignment Audit — Nectarine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#F5F3ED;
+  --surface:#FFFFFF;
+  --ink:#16181D;
+  --muted:#83806F;
+  --line:#E1DDD0;
+  --accent:#FF5A3C;
+  --accent-deep:#C23B1F;
+  --accent-soft:#FCE3DA;
+  --teal:#1F5C55;
+  --teal-soft:#E3EEEB;
+  --danger:#B23A2E;
+  --danger-soft:#F5DFDA;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Newsreader', Georgia, serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+#app{
+  max-width:720px;
+  margin:0 auto;
+  padding:clamp(1.5rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 1.5rem) 5rem;
+}
+::selection{background:var(--accent-soft);}
+
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:.7rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+h1,h2,h3{
+  font-family:var(--font-display);
+  font-weight:700;
+  letter-spacing:-0.01em;
+  margin:0;
+}
+.h-intro{font-size:clamp(2.1rem, 6vw, 3.1rem); line-height:1.05; margin-top:.6rem;}
+.h-question{font-size:clamp(1.5rem, 4.5vw, 2rem); line-height:1.15; margin-top:.9rem;}
+.h-section{font-size:1.05rem; letter-spacing:.02em;}
+p{line-height:1.65; margin:0.8rem 0 0;}
+.lede{font-size:1.1rem; font-style:italic; color:#3a3d44; margin-top:.9rem;}
+.muted{color:var(--muted);}
+.mono{font-family:var(--font-mono);}
+.small{font-size:.8rem;}
+
+a, .link-btn{color:var(--ink); cursor:pointer;}
+
+.btn{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:.92rem;
+  border:none;
+  border-radius:3px;
+  padding:.85rem 1.7rem;
+  cursor:pointer;
+  transition:transform .12s ease, background .15s ease, opacity .15s ease;
+}
+.btn-primary{background:var(--accent); color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--accent-deep);}
+.btn-primary:active:not(:disabled){transform:translateY(1px);}
+.btn-primary:disabled{opacity:.35; cursor:not-allowed;}
+.btn-ghost{
+  background:none;
+  font-family:var(--font-mono);
+  font-size:.75rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-decoration:underline;
+  padding:0;
+  border:none;
+}
+.btn-ghost:hover{color:var(--ink);}
+
+.row-actions{display:flex; align-items:center; justify-content:space-between; margin-top:2rem; gap:1rem; flex-wrap:wrap;}
+
+.progress-wrap{margin-bottom:2.2rem;}
+.progress-track{height:2px; background:var(--line); width:100%; margin-top:.6rem; position:relative;}
+.progress-fill{height:2px; background:var(--accent); transition:width .4s ease;}
+
+textarea, input[type=text], input[type=email]{
+  width:100%;
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  color:var(--ink);
+  background:transparent;
+  border:none;
+  border-bottom:1.5px solid var(--line);
+  padding:.6rem 0;
+  resize:vertical;
+  min-height:5.5rem;
+  outline:none;
+  transition:border-color .15s ease;
+}
+textarea:focus, input[type=text]:focus, input[type=email]:focus{border-color:var(--accent);}
+input[type=text], input[type=email]{min-height:auto;}
+
+.field{margin-top:1.6rem;}
+.field label{display:block; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem;}
+.field-error{font-family:var(--font-mono); font-size:.72rem; color:var(--danger); margin-top:.4rem;}
+
+.upload-zone{
+  display:block;
+  border:1.5px dashed var(--line);
+  padding:1.1rem 1rem;
+  text-align:center;
+  cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+  font-family:var(--font-mono);
+  font-size:.78rem;
+  color:var(--muted);
+}
+.upload-zone:hover{border-color:var(--accent); color:var(--ink);}
+.upload-zone input{display:none;}
+.thumb-row{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.7rem;}
+.thumb{position:relative; width:64px; height:64px; border:1px solid var(--line); overflow:hidden;}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+.thumb .rm{
+  position:absolute; top:0; right:0; background:rgba(22,24,29,.75); color:#fff;
+  width:18px; height:18px; font-size:.65rem; line-height:18px; text-align:center; cursor:pointer;
+  font-family:var(--font-mono);
+}
+
+.shot-preview{margin-top:.7rem; border:1px solid var(--line); background:var(--surface); padding:.6rem;}
+.shot-preview img{width:100%; height:auto; display:block; max-height:220px; object-fit:cover; background:var(--bg); min-height:60px;}
+.shot-meta{display:flex; align-items:center; justify-content:space-between; margin-top:.5rem; flex-wrap:wrap; gap:.5rem;}
+.shot-status{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
+.shot-actions{display:flex; gap:1rem;}
+.shot-override-row{margin-top:.6rem;}
+
+.loading-wrap{min-height:40vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+.loading-word{
+  font-family:var(--font-display); font-weight:700; font-size:clamp(2.2rem,7vw,3.2rem);
+  filter:blur(9px); opacity:.45; animation:pulseFuzz 1.8s ease-in-out infinite;
+}
+@keyframes pulseFuzz{
+  0%{filter:blur(9px); opacity:.35;}
+  50%{filter:blur(1px); opacity:.95;}
+  100%{filter:blur(9px); opacity:.35;}
+}
+.loading-msg{font-family:var(--font-mono); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:1.4rem; min-height:1.2em;}
+
+.score-block{margin-top:.4rem;}
+.score-word{
+  font-family:var(--font-display); font-weight:700;
+  font-size:clamp(2.4rem, 8vw, 4rem); letter-spacing:-0.02em; line-height:1;
+  animation-duration:1.4s; animation-timing-function:ease; animation-fill-mode:forwards;
+}
+.score-word.aligned{color:var(--teal); animation-name:focusInFull;}
+.score-word.some{color:var(--accent-deep); animation-name:focusInPartial;}
+.score-word.significant{color:var(--danger); animation-name:focusInHeavy;}
+@keyframes focusInFull{from{filter:blur(9px); opacity:0;} to{filter:blur(0px); opacity:1;}}
+@keyframes focusInPartial{from{filter:blur(11px); opacity:0;} to{filter:blur(2.5px); opacity:1;}}
+@keyframes focusInHeavy{from{filter:blur(13px); opacity:0;} to{filter:blur(5px); opacity:.92;}}
+.score-caption{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:.6rem;}
+
+.section{margin-top:2.6rem; padding-top:1.6rem; border-top:1px solid var(--line);}
+.section-num{font-family:var(--font-mono); font-size:.72rem; color:var(--accent-deep); letter-spacing:.1em;}
+
+.chip-row{margin-top:.7rem;}
+.chip{
+  display:inline-block; font-family:var(--font-mono); font-size:.7rem; letter-spacing:.05em; text-transform:uppercase;
+  border:1px solid var(--line); border-radius:999px; padding:.28rem .7rem; margin:0 .35rem .35rem 0;
+}
+.chip.overlap{border-color:var(--teal); color:var(--teal); background:var(--teal-soft);}
+
+.flag-list{margin-top:.7rem; padding-left:1.1rem;}
+.flag-list li{margin-bottom:.3rem; font-size:.92rem;}
+
+.consider-box{border-left:3px solid var(--accent-deep); background:var(--accent-soft); padding:.7rem 1rem; margin-top:.8rem;}
+.consider-box .issue{font-weight:600; font-family:var(--font-display); font-size:.9rem;}
+.consider-box .example{font-size:.88rem; margin-top:.3rem; color:#3a3d44;}
+
+.check-row{display:flex; gap:.7rem; padding:.6rem 0; border-bottom:1px solid var(--line); align-items:flex-start;}
+.check-row:last-child{border-bottom:none;}
+.check-icon{font-family:var(--font-mono); font-size:.85rem; width:1.1rem; flex-shrink:0; margin-top:.1rem;}
+.check-icon.bad{color:var(--danger);}
+.check-icon.good{color:var(--teal);}
+.check-label{font-size:.92rem;}
+.check-note{font-family:var(--font-mono); font-size:.72rem; color:var(--muted); margin-top:.15rem;}
+
+.fuzz-source{background:var(--accent-soft); padding:1rem 1.1rem; margin-top:.8rem; font-size:.95rem;}
+
+.footer-note{margin-top:3rem; text-align:center;}
+
+.error-box{border:1.5px solid var(--danger); padding:1.2rem; margin-top:1.5rem; font-size:.92rem;}
+
+@media (max-width:520px){
+  .row-actions{flex-direction:column; align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function(){
+
+/* Five questions, down from the original seven. Two were folded into
+   neighbors (why-it-exists into what-you-do, how-you-want-to-be-perceived
+   into industry/comparables) rather than dropped, since the analysis
+   prompts below still rely on that signal for detecting an intentional
+   "bridge" between two worlds. */
+var CORE_QUESTIONS = [
+  { text: "What does your business do, and why does it exist?" },
+  { text: "Who is your ideal customer, and what problem are you solving for them?" },
+  { text: "What different worlds, if any, does your business bridge: industries, audiences, traditions, price points, old and new? Where does your offer sit between them?" },
+  { text: "Your industry, two or three brands you'd want to be compared against, and any way you want to be perceived that you're not confident you're achieving." },
+  { text: "Your core values, if you've put them into words.", skippable: true, skipNote: "(not specified, infer implied values from the mission or why answer above instead)" }
+];
+
+var CHECKLIST_LABELS = [
+  "Buttons are consistent in size, shape, and style",
+  "Buttons and links work as expected",
+  "The site resizes well across devices",
+  "The logo stays legible at small scale",
+  "The logo holds up cleanly at large scale",
+  "Colors and fonts stay consistent across posts and pages",
+  "Images feel consistent, not generic stock",
+  "A favicon is set on the website",
+  "The social grid or cover images have a visual rhythm",
+  "Writing style stays consistent across pages and posts",
+  "Padding and text alignment are consistent",
+  "A clear grid system underlies the layout"
+];
+
+var LOADING_MESSAGES = [
+  "Reading the visual identity",
+  "Reading the verbal identity",
+  "Comparing tone signals",
+  "Checking market and audience fit",
+  "Running the execution checklist",
+  "Drafting the report"
+];
+
+function freshState(){
+  return {
+    screen: 'intro',
+    companyName: '',
+    qIndex: 0,
+    questions: CORE_QUESTIONS.slice(),
+    answers: ['','','','',''],
+    followUpsFetched: false,
+    logo: null,
+    site: '',
+    siteOverride: null,
+    siteAttempt: 0,
+    social: '',
+    socialOverride: null,
+    socialAttempt: 0,
+    leadName: '',
+    leadEmail: '',
+    leadSubmitting: false,
+    leadError: '',
+    report: null,
+    errorMsg: ''
+  };
+}
+
+var state = freshState();
+var loadingTimer = null;
+
+function esc(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function isValidEmail(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim());
+}
+
+function resizeImage(file, maxDim, quality){
+  maxDim = maxDim || 1100;
+  quality = quality || 0.82;
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if(w > h){ if(w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; } }
+        else { if(h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; } }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        var dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve({data: dataUrl.split(',')[1], media_type:'image/jpeg', preview: dataUrl});
+      };
+      img.onerror = function(){ reject(new Error("Could not read image")); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function(){ reject(new Error("Could not read file")); };
+    reader.readAsDataURL(file);
+  });
+}
+
+function normalizeUrl(raw){
+  raw = (raw || '').trim();
+  if(!raw) return '';
+  if(!/^https?:\/\//i.test(raw)){ raw = 'https://' + raw; }
+  return raw;
+}
+
+/* Live screenshots now run server-side against Cloudflare's Browser
+   Rendering API (see functions/api/screenshot.js), not the old
+   client-side mshots embed. The endpoint renders synchronously and
+   returns the image directly, so there's no polling or placeholder
+   flicker to work around, just a normal image load with a status line
+   and an upload fallback for sites or logged-in social pages that
+   block automated rendering. */
+function shotSrc(kind){
+  var url = state[kind];
+  if(!url) return '';
+  var attempt = state[kind + 'Attempt'] || 0;
+  return '/api/screenshot?url=' + encodeURIComponent(url) + (attempt ? ('&r=' + attempt) : '');
+}
+
+function shotBodyHTML(kind){
+  var url = state[kind];
+  var override = state[kind + 'Override'];
+  if(override){
+    return '<div class="shot-preview"><img src="' + override.preview + '">'
+      + '<div class="shot-meta"><span class="shot-status">Uploaded manually</span>'
+      + '<span class="shot-actions"><span class="link-btn btn-ghost" data-action="rm-override">Remove</span></span></div></div>';
+  }
+  if(url){
+    var imgId = kind + '-shot-img';
+    return '<div class="shot-preview"><img id="' + imgId + '" src="' + shotSrc(kind) + '"'
+      + ' onload="window.__shotLoaded && window.__shotLoaded(\'' + kind + '\')"'
+      + ' onerror="window.__shotError && window.__shotError(\'' + kind + '\')">'
+      + '<div class="shot-meta"><span class="shot-status" id="' + kind + '-shot-status">Capturing a live preview, this can take a few seconds</span>'
+      + '<span class="shot-actions">'
+      + '<span class="link-btn btn-ghost" data-action="retake">Retake</span>'
+      + '<span class="link-btn btn-ghost" data-action="show-override">Upload instead</span>'
+      + '</span></div></div>'
+      + '<div class="shot-override-row" id="' + kind + '-override-row" style="display:none;">'
+      + '  <label class="upload-zone" for="' + kind + '-override-input">Click to upload a screenshot instead<input type="file" id="' + kind + '-override-input" accept="image/*"></label>'
+      + '</div>';
+  }
+  return '';
+}
+
+function refreshShotBody(kind){
+  var container = document.getElementById(kind + '-body');
+  if(container){ container.innerHTML = shotBodyHTML(kind); }
+  bindShotBody(kind);
+}
+
+function bindShotBody(kind){
+  var container = document.getElementById(kind + '-body');
+  if(!container) return;
+  var retake = container.querySelector('[data-action="retake"]');
+  if(retake){
+    retake.onclick = function(){
+      state[kind + 'Attempt'] = (state[kind + 'Attempt'] || 0) + 1;
+      var status = document.getElementById(kind + '-shot-status');
+      if(status) status.textContent = 'Retaking...';
+      var img = document.getElementById(kind + '-shot-img');
+      if(img) img.src = shotSrc(kind);
+    };
+  }
+  var showOverride = container.querySelector('[data-action="show-override"]');
+  if(showOverride){
+    showOverride.onclick = function(){
+      var row = document.getElementById(kind + '-override-row');
+      if(row) row.style.display = 'block';
+    };
+  }
+  var overrideInput = document.getElementById(kind + '-override-input');
+  if(overrideInput){
+    overrideInput.addEventListener('change', function(e){
+      var f = e.target.files[0];
+      if(f){ resizeImage(f).then(function(img){ state[kind + 'Override'] = img; refreshShotBody(kind); }); }
+    });
+  }
+  var rmOverride = container.querySelector('[data-action="rm-override"]');
+  if(rmOverride){
+    rmOverride.onclick = function(){ state[kind + 'Override'] = null; refreshShotBody(kind); };
+  }
+}
+
+window.__shotLoaded = function(kind){
+  var status = document.getElementById(kind + '-shot-status');
+  if(status){ status.textContent = 'Live preview captured'; }
+};
+window.__shotError = function(kind){
+  var status = document.getElementById(kind + '-shot-status');
+  if(status){ status.textContent = "Couldn't capture this one automatically, some sites and most logged-in social pages block it. Upload a screenshot below instead."; }
+};
+
+function bindShotField(kind){
+  var input = document.getElementById(kind + '-field');
+  if(input){
+    input.addEventListener('change', function(e){
+      var normalized = normalizeUrl(e.target.value);
+      state[kind] = normalized;
+      state[kind + 'Override'] = null;
+      state[kind + 'Attempt'] = 0;
+      refreshShotBody(kind);
+    });
+  }
+  bindShotBody(kind);
+}
+
+function render(){
+  var app = document.getElementById('app');
+  if(state.screen === 'intro') app.innerHTML = renderIntro();
+  else if(state.screen === 'company') app.innerHTML = renderCompany();
+  else if(state.screen === 'question') app.innerHTML = renderQuestion();
+  else if(state.screen === 'followup-loading') app.innerHTML = renderMiniLoading("Reviewing your answers");
+  else if(state.screen === 'assets') app.innerHTML = renderAssets();
+  else if(state.screen === 'lead') app.innerHTML = renderLead();
+  else if(state.screen === 'generating') app.innerHTML = renderGenerating();
+  else if(state.screen === 'report') app.innerHTML = renderReport();
+  else if(state.screen === 'error') app.innerHTML = renderErrorScreen();
+  bindEvents();
+}
+
+/* ---------- INTRO ---------- */
+function renderIntro(){
+  return ''
+  + '<div class="eyebrow">Nectarine Diagnostic</div>'
+  + '<h1 class="h-intro">Brand Alignment<br>Audit</h1>'
+  + '<p class="lede">A quick, honest read on whether your visual identity, your narrative, your market, and your audience actually point the same direction.</p>'
+  + '<p class="muted">About 6 minutes. A handful of short questions, then a website and a social link, this audit captures those live. Your logo is the only thing you\'ll need to upload.</p>'
+  + '<div class="row-actions">'
+  + '  <button class="btn btn-primary" id="start-btn">Begin the audit</button>'
+  + '</div>'
+  + '<p class="mono small muted" style="margin-top:3rem;">Your answers and images are sent to Claude for analysis and used only to generate your report.</p>';
+}
+
+/* ---------- COMPANY NAME ---------- */
+function renderCompany(){
+  var val = esc(state.companyName);
+  return ''
+  + '<div class="eyebrow">First</div>'
+  + '<h2 class="h-question">What\'s the name of your company or brand?</h2>'
+  + '<div class="field">'
+  + '  <input type="text" id="company-field" placeholder="Your company name" value="' + val + '" autofocus>'
+  + '</div>'
+  + '<div class="row-actions">'
+  + '  <span class="link-btn btn-ghost" id="back-btn">← Start over</span>'
+  + '  <button class="btn btn-primary" id="continue-btn"' + (val.trim() ? '' : ' disabled') + '>Continue</button>'
+  + '</div>';
+}
+
+/* ---------- QUESTION ---------- */
+function renderQuestion(){
+  var total = state.questions.length;
+  var idx = state.qIndex;
+  var q = state.questions[idx];
+  var pct = Math.round(((idx) / total) * 100);
+  var val = esc(state.answers[idx] || '');
+  var skipLink = q.skippable ? '<p style="margin-top:1rem;"><span class="link-btn btn-ghost" id="skip-btn">Skip — I haven\'t defined these yet</span></p>' : '';
+  return ''
+  + '<div class="progress-wrap">'
+  + '  <div class="mono small muted">QUESTION ' + String(idx+1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0') + '</div>'
+  + '  <div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>'
+  + '</div>'
+  + '<h2 class="h-question">' + esc(q.text) + '</h2>'
+  + '<div class="field">'
+  + '  <textarea id="answer-field" autofocus>' + val + '</textarea>'
+  + '</div>'
+  + skipLink
+  + '<div class="row-actions">'
+  + '  <span class="link-btn btn-ghost" id="back-btn">← Back</span>'
+  + '  <button class="btn btn-primary" id="continue-btn" disabled>Continue</button>'
+  + '</div>'
+  + '<p class="mono small muted" style="margin-top:1rem;">⌘ / Ctrl + Enter to continue</p>';
+}
+
+/* ---------- MINI LOADING ---------- */
+function renderMiniLoading(msg){
+  return '<div class="loading-wrap" style="min-height:30vh;">'
+  + '<div class="loading-word" style="font-size:1.6rem;">Nectarine</div>'
+  + '<div class="loading-msg">' + esc(msg) + '</div>'
+  + '</div>';
+}
+
+/* ---------- ASSETS ---------- */
+function shotFieldHTML(kind, label, placeholder){
+  return ''
+  + '<div class="field">'
+  + '  <label>' + esc(label) + '</label>'
+  + '  <input type="text" id="' + kind + '-field" placeholder="' + esc(placeholder) + '" value="' + esc(state[kind]) + '">'
+  + '  <div id="' + kind + '-body">' + shotBodyHTML(kind) + '</div>'
+  + '</div>';
+}
+
+function renderAssets(){
+  var logoThumb = state.logo ? '<div class="thumb"><img src="' + state.logo.preview + '"><span class="rm" data-action="rm-logo">×</span></div>' : '';
+  return ''
+  + '<div class="eyebrow">Next</div>'
+  + '<h2 class="h-question">Your assets</h2>'
+  + '<p class="muted">All of these are optional, but the more the audit has to look at, the sharper the visual read. The site and social link capture themselves, live.</p>'
+  + shotFieldHTML('site', 'Website URL', 'https://')
+  + shotFieldHTML('social', 'Social profile URL (Instagram, LinkedIn, etc.)', 'https://')
+  + '<div class="field">'
+  + '  <label>Logo (optional)</label>'
+  + '  <label class="upload-zone" for="logo-input">' + (state.logo ? 'Replace logo file' : 'Click to upload a logo file') + '<input type="file" id="logo-input" accept="image/*"></label>'
+  + '  <div class="thumb-row">' + logoThumb + '</div>'
+  + '</div>'
+  + '<div class="row-actions">'
+  + '  <span class="link-btn btn-ghost" id="back-btn">← Back</span>'
+  + '  <button class="btn btn-primary" id="continue-btn">Continue</button>'
+  + '</div>'
+  + '<p class="mono small muted" style="margin-top:1.6rem;">Some sites and most social platforms occasionally block automatic capture. If a preview looks blank or stuck, use the upload option beneath it.</p>';
+}
+
+/* ---------- LEAD GATE ---------- */
+function renderLead(){
+  var nameVal = esc(state.leadName);
+  var emailVal = esc(state.leadEmail);
+  var errorHTML = state.leadError ? '<div class="field-error">' + esc(state.leadError) + '</div>' : '';
+  return ''
+  + '<div class="eyebrow">Last step</div>'
+  + '<h2 class="h-question">Where should we send it?</h2>'
+  + '<p class="muted">Your report generates right after this. Someone from Nectarine may follow up with a few notes.</p>'
+  + '<div class="field">'
+  + '  <label>Your name</label>'
+  + '  <input type="text" id="lead-name-field" placeholder="Full name" value="' + nameVal + '" autofocus>'
+  + '</div>'
+  + '<div class="field">'
+  + '  <label>Email</label>'
+  + '  <input type="email" id="lead-email-field" placeholder="you@company.com" value="' + emailVal + '">'
+  + '  ' + errorHTML
+  + '</div>'
+  + '<div class="row-actions">'
+  + '  <span class="link-btn btn-ghost" id="back-btn">← Back</span>'
+  + '  <button class="btn btn-primary" id="generate-btn"' + (state.leadSubmitting ? ' disabled' : '') + '>' + (state.leadSubmitting ? 'Sending…' : 'Generate my audit') + '</button>'
+  + '</div>';
+}
+
+/* ---------- GENERATING ---------- */
+function renderGenerating(){
+  return '<div class="loading-wrap">'
+  + '<div class="loading-word">Nectarine</div>'
+  + '<div class="loading-msg" id="loading-msg">' + LOADING_MESSAGES[0] + '</div>'
+  + '</div>';
+}
+
+/* ---------- ERROR ---------- */
+function renderErrorScreen(){
+  return ''
+  + '<h2 class="h-question">Something didn\'t load</h2>'
+  + '<div class="error-box">' + esc(state.errorMsg || 'The audit ran into a problem generating your report.') + '</div>'
+  + '<div class="row-actions">'
+  + '  <span class="link-btn btn-ghost" id="back-to-lead">← Back</span>'
+  + '  <button class="btn btn-primary" id="retry-btn">Try again</button>'
+  + '</div>';
+}
+
+/* ---------- REPORT ---------- */
+function scoreClass(score){
+  if(score === 'Aligned') return 'aligned';
+  if(score === 'Significant Fuzz') return 'significant';
+  return 'some';
+}
+function scoreCaption(score){
+  if(score === 'Aligned') return 'Sharp. The word above is fully in focus.';
+  if(score === 'Significant Fuzz') return 'Heavy fuzz. The word above stays out of focus on purpose.';
+  return 'Some fuzz. The word above only partly sharpens.';
+}
+
+function renderReport(){
+  var r = state.report;
+  var sc = scoreClass(r.overall_score);
+  var visualTone = (r.visual_tone||[]).map(function(w){return '<span class="chip">'+esc(w)+'</span>';}).join('');
+  var verbalTone = (r.verbal_tone||[]).map(function(w){return '<span class="chip">'+esc(w)+'</span>';}).join('');
+  var overlap = (r.alignment_overlap||[]).map(function(w){return '<span class="chip overlap">'+esc(w)+'</span>';}).join('');
+  var visualFlags = (r.visual_red_flags||[]).length ? '<ul class="flag-list">' + r.visual_red_flags.map(function(f){return '<li>'+esc(f)+'</li>';}).join('') + '</ul>' : '<p class="mono small muted" style="margin-top:.6rem;">Nothing here reads against the stated direction.</p>';
+  var verbalFlags = (r.verbal_red_flags||[]).length ? '<ul class="flag-list">' + r.verbal_red_flags.map(function(f){return '<li>'+esc(f)+'</li>';}).join('') + '</ul>' : '<p class="mono small muted" style="margin-top:.6rem;">Nothing here reads against the stated direction.</p>';
+  var conflicts = (r.alignment_conflicts||[]).length ? r.alignment_conflicts.map(function(c){
+    return '<div class="consider-box"><div class="issue">'+esc(c.issue)+'</div><div class="example">'+esc(c.example)+'</div></div>';
+  }).join('') : '<p class="mono small muted" style="margin-top:.6rem;">The visual and verbal reads broadly line up.</p>';
+  var checklist = CHECKLIST_LABELS.map(function(label, i){
+    var item = (r.execution_checklist && r.execution_checklist[i]) || {flagged:false, note:''};
+    var icon = item.flagged ? '<span class="check-icon bad">✕</span>' : '<span class="check-icon good">✓</span>';
+    return '<div class="check-row">' + icon + '<div><div class="check-label">'+esc(label)+'</div>' + (item.note ? '<div class="check-note">'+esc(item.note)+'</div>' : '') + '</div></div>';
+  }).join('');
+  var fuzzSourceBlock = (r.fuzz_source && r.overall_score !== 'Aligned') ? ''
+    + '<div class="section">'
+    + '  <div class="section-num mono">06 — WHERE THE FUZZ IS COMING FROM</div>'
+    + '  <div class="fuzz-source">' + esc(r.fuzz_source) + '</div>'
+    + '</div>' : '';
+
+  return ''
+  + '<div class="eyebrow">Brand Alignment Audit</div>'
+  + '<h1 class="h-intro" style="font-size:clamp(1.6rem,4.5vw,2.2rem);">' + esc(r.business_name || state.companyName || 'Your brand') + '</h1>'
+  + '<div class="score-block">'
+  + '  <div class="score-word ' + sc + '">' + esc(r.overall_score) + '</div>'
+  + '  <div class="score-caption">' + scoreCaption(r.overall_score) + '</div>'
+  + '</div>'
+  + '<p class="lede">' + esc(r.snapshot) + '</p>'
+
+  + '<div class="section">'
+  + '  <div class="section-num mono">01 — VISUAL IDENTITY</div>'
+  + '  <h3 class="h-section" style="margin-top:.5rem;">How it reads</h3>'
+  + '  <div class="chip-row">' + (visualTone || '<span class="mono small muted">No images provided</span>') + '</div>'
+  + '  <p>' + esc(r.visual_findings) + '</p>'
+  + '  ' + visualFlags
+  + '</div>'
+
+  + '<div class="section">'
+  + '  <div class="section-num mono">02 — VERBAL IDENTITY</div>'
+  + '  <h3 class="h-section" style="margin-top:.5rem;">How it reads</h3>'
+  + '  <div class="chip-row">' + verbalTone + '</div>'
+  + '  <p>' + esc(r.verbal_findings) + '</p>'
+  + '  ' + verbalFlags
+  + '</div>'
+
+  + '<div class="section">'
+  + '  <div class="section-num mono">03 — VISUAL / VERBAL ALIGNMENT</div>'
+  + '  <p>' + esc(r.alignment_summary) + '</p>'
+  + '  <div class="chip-row">' + (overlap || '<span class="mono small muted">No shared tone words</span>') + '</div>'
+  + '  ' + conflicts
+  + '</div>'
+
+  + '<div class="section">'
+  + '  <div class="section-num mono">04 — MARKET AND AUDIENCE FIT</div>'
+  + '  <p>' + esc(r.market_category_norms) + '</p>'
+  + '  <p>' + esc(r.market_audience_match) + '</p>'
+  + '</div>'
+
+  + '<div class="section">'
+  + '  <div class="section-num mono">05 — EXECUTION AND CONSISTENCY</div>'
+  + '  <p class="mono small muted" style="margin-top:.5rem;">A check means this looks solid. A mark means it is worth a closer look.</p>'
+  + '  <div style="margin-top:.8rem;">' + checklist + '</div>'
+  + '</div>'
+
+  + fuzzSourceBlock
+
+  + '<div class="footer-note">'
+  + '  <button class="btn btn-primary" id="restart-btn">Run another audit</button>'
+  + '  <p class="mono small muted" style="margin-top:1rem;">Diagnostic by Nectarine</p>'
+  + '</div>';
+}
+
+/* ---------- EVENTS ---------- */
+function bindEvents(){
+  if(state.screen === 'intro'){
+    document.getElementById('start-btn').onclick = function(){
+      state.screen = 'company'; render();
+    };
+  }
+  else if(state.screen === 'company'){
+    var field = document.getElementById('company-field');
+    var cont = document.getElementById('continue-btn');
+    field.addEventListener('input', function(){ cont.disabled = field.value.trim().length === 0; });
+    field.focus();
+    field.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && !cont.disabled){ cont.click(); }
+    });
+    document.getElementById('back-btn').onclick = function(){ state.screen = 'intro'; render(); };
+    cont.onclick = function(){
+      state.companyName = field.value.trim();
+      state.screen = 'question'; state.qIndex = 0;
+      render();
+    };
+  }
+  else if(state.screen === 'question'){
+    var field = document.getElementById('answer-field');
+    var cont = document.getElementById('continue-btn');
+    function sync(){ cont.disabled = field.value.trim().length === 0; }
+    field.addEventListener('input', sync);
+    field.focus();
+    var len = field.value.length; field.setSelectionRange(len, len);
+    sync();
+    field.addEventListener('keydown', function(e){
+      if((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !cont.disabled){ cont.click(); }
+    });
+    document.getElementById('back-btn').onclick = function(){
+      if(state.qIndex > 0){ state.answers[state.qIndex] = field.value; state.qIndex--; render(); }
+      else { state.screen = 'company'; render(); }
+    };
+    function advanceQuestion(){
+      if(state.qIndex < state.questions.length - 1){
+        state.qIndex++; render();
+      } else if(!state.followUpsFetched){
+        state.screen = 'followup-loading'; render();
+        fetchFollowUps();
+      } else {
+        state.screen = 'assets'; render();
+      }
+    }
+    cont.onclick = function(){
+      state.answers[state.qIndex] = field.value.trim();
+      advanceQuestion();
+    };
+    var skipBtn = document.getElementById('skip-btn');
+    if(skipBtn){
+      skipBtn.onclick = function(){
+        state.answers[state.qIndex] = '';
+        advanceQuestion();
+      };
+    }
+  }
+  else if(state.screen === 'assets'){
+    bindShotField('site');
+    bindShotField('social');
+    document.getElementById('logo-input').addEventListener('change', function(e){
+      var f = e.target.files[0];
+      if(f){ resizeImage(f).then(function(img){ state.logo = img; render(); }); }
+    });
+    var rmLogo = document.querySelector('[data-action="rm-logo"]');
+    if(rmLogo) rmLogo.onclick = function(){ state.logo = null; render(); };
+    document.getElementById('back-btn').onclick = function(){ state.screen = 'question'; state.qIndex = state.questions.length - 1; render(); };
+    document.getElementById('continue-btn').onclick = function(){
+      var siteField = document.getElementById('site-field');
+      var socialField = document.getElementById('social-field');
+      if(siteField) state.site = normalizeUrl(siteField.value);
+      if(socialField) state.social = normalizeUrl(socialField.value);
+      state.screen = 'lead';
+      render();
+    };
+  }
+  else if(state.screen === 'lead'){
+    var nameField = document.getElementById('lead-name-field');
+    var emailField = document.getElementById('lead-email-field');
+    document.getElementById('back-btn').onclick = function(){
+      state.leadName = nameField.value; state.leadEmail = emailField.value;
+      state.screen = 'assets'; render();
+    };
+    document.getElementById('generate-btn').onclick = function(){
+      state.leadName = nameField.value.trim();
+      state.leadEmail = emailField.value.trim();
+      if(!state.leadName || !isValidEmail(state.leadEmail)){
+        state.leadError = !state.leadName ? 'Add your name to continue.' : 'Add a valid email to continue.';
+        render();
+        return;
+      }
+      state.leadError = '';
+      submitLeadThenGenerate();
+    };
+  }
+  else if(state.screen === 'generating'){
+    var i = 0;
+    var msgEl = document.getElementById('loading-msg');
+    loadingTimer = setInterval(function(){
+      i = (i+1) % LOADING_MESSAGES.length;
+      if(msgEl) msgEl.textContent = LOADING_MESSAGES[i];
+    }, 1700);
+  }
+  else if(state.screen === 'error'){
+    document.getElementById('retry-btn').onclick = function(){ generateReport(); };
+    document.getElementById('back-to-lead').onclick = function(){ state.screen = 'lead'; render(); };
+  }
+  else if(state.screen === 'report'){
+    document.getElementById('restart-btn').onclick = function(){
+      state = freshState();
+      render();
+    };
+  }
+}
+
+/* ---------- FLOW LOGIC ---------- */
+function buildAnswersPayload(){
+  return state.questions.map(function(q, i){
+    var ans = state.answers[i];
+    var answerText;
+    if(ans && ans.trim()){ answerText = ans; }
+    else { answerText = q.skippable ? q.skipNote : '(no answer given)'; }
+    return { question: q.text, answer: answerText };
+  });
+}
+
+function fetchFollowUps(){
+  fetch('/api/followup', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ companyName: state.companyName, answers: buildAnswersPayload() })
+  })
+  .then(function(res){ return res.ok ? res.json() : { questions: [] }; })
+  .then(function(result){
+    state.followUpsFetched = true;
+    var qs = (result && result.questions) || [];
+    qs = qs.slice(0,2).map(function(q){ return {text: q, skippable: false}; });
+    if(qs.length > 0){
+      state.questions = state.questions.concat(qs);
+      state.answers = state.answers.concat(qs.map(function(){ return ''; }));
+      state.qIndex++;
+      state.screen = 'question';
+    } else {
+      state.screen = 'assets';
+    }
+    render();
+  })
+  .catch(function(){
+    state.followUpsFetched = true;
+    state.screen = 'assets';
+    render();
+  });
+}
+
+function submitLeadThenGenerate(){
+  state.leadSubmitting = true;
+  render();
+  fetch('/api/lead', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      name: state.leadName,
+      email: state.leadEmail,
+      companyName: state.companyName,
+      answers: buildAnswersPayload()
+    })
+  })
+  .catch(function(){ /* a CRM hiccup shouldn't block the report the person was promised */ })
+  .then(function(){
+    state.leadSubmitting = false;
+    generateReport();
+  });
+}
+
+function generateReport(){
+  clearInterval(loadingTimer);
+  state.screen = 'generating';
+  render();
+
+  var payload = {
+    companyName: state.companyName,
+    answers: buildAnswersPayload(),
+    site: state.site || null,
+    social: state.social || null,
+    logo: state.logo ? { data: state.logo.data, media_type: state.logo.media_type } : null,
+    siteOverride: state.siteOverride ? { data: state.siteOverride.data, media_type: state.siteOverride.media_type } : null,
+    socialOverride: state.socialOverride ? { data: state.socialOverride.data, media_type: state.socialOverride.media_type } : null
+  };
+
+  fetch('/api/report', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(res){
+    if(!res.ok){ throw new Error('Request failed with status ' + res.status); }
+    return res.json();
+  })
+  .then(function(report){
+    state.report = report;
+    state.screen = 'report';
+    render();
+  })
+  .catch(function(){
+    state.errorMsg = "The audit couldn't finish generating. This sometimes happens with a slow connection, a site that blocks automatic capture, or a very large image. Try again, or go back and upload a screenshot instead.";
+    state.screen = 'error';
+    render();
+  });
+}
+
+render();
+})();
+</script>
+</body>
+</html>
