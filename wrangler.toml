@@ -1,0 +1,11 @@
+name = "brand-audit"
+main = "functions/worker.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Secrets (set these with `wrangler secret put <NAME>`, do not put real
+# values in this file): ANTHROPIC_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN,
+# HUBSPOT_TOKEN
