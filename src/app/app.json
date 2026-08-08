@@ -1,0 +1,7 @@
+{
+  "name": "BrandAudit",
+  "description": "Private app for CRM contact access",
+  "uid": "brand_audit_app",
+  "scopes": ["crm.objects.contacts.read", "crm.objects.contacts.write"],
+  "public": false
+}
