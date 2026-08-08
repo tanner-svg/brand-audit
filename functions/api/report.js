@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
 
   try {
     const visualContent = await buildVisualContent(payload, env);
-    const visualVerbalResult = await callClaude(VISUAL_VERBAL_SYSTEM, visualContent, 1000, env);
+    const visualVerbalResult = await callClaude(VISUAL_VERBAL_SYSTEM, visualContent, 1500, env);
 
     const checklistText = CHECKLIST_LABELS.map(function (l, i) { return (i + 1) + ". " + l; }).join("\n");
     const scoreText = ""
@@ -49,7 +49,7 @@ export async function onRequestPost(context) {
       + "Client answers:\n" + buildAnswersText(payload.companyName, payload.answers) + "\n\n"
       + "Execution checklist items, in order:\n" + checklistText;
 
-    const scoreResult = await callClaude(ALIGNMENT_SCORE_SYSTEM, [{ type: "text", text: scoreText }], 1000, env);
+    const scoreResult = await callClaude(ALIGNMENT_SCORE_SYSTEM, [{ type: "text", text: scoreText }], 3000, env);
     const report = normalizeReport(visualVerbalResult, scoreResult, payload.companyName);
 
     return new Response(JSON.stringify(report), {
