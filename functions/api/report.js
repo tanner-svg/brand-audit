@@ -1,19 +1,4 @@
-import { callClaude, captureScreenshot, arrayBufferToBase64, buildAnswersText } from "../_shared.js";
-
-const CHECKLIST_LABELS = [
-  "Buttons are consistent in size, shape, and style",
-  "Buttons and links work as expected",
-  "The site resizes well across devices",
-  "The logo stays legible at small scale",
-  "The logo holds up cleanly at large scale",
-  "Colors and fonts stay consistent across posts and pages",
-  "Images feel consistent, not generic stock",
-  "A favicon is set on the website",
-  "The social grid or cover images have a visual rhythm",
-  "Writing style stays consistent across pages and posts",
-  "Padding and text alignment are consistent",
-  "A clear grid system underlies the layout"
-];
+import { callClaude, captureScreenshot, arrayBufferToBase64, buildAnswersText, CHECKLIST_LABELS, sendReportEmail } from "../_shared.js";
 
 const VISUAL_VERBAL_SYSTEM = "You are the analysis engine behind Nectarine's Brand Alignment Audit, a diagnostic tool that checks whether a brand's visual identity and its narrative actually align.\n\nVoice rules for every field you write: never use em dashes, use commas or periods instead. Never use the word we. Speak plainly, no corporate buzzwords, no AI-sounding language, no dramatic tone. Every claim must point to something specific you can see in the images or read in the answers, never a generic assertion. Be extremely concise, this output must be short.\n\nTreat the client's stated mission, vision, values, and audience as their own intent and guidance, not as rules to grade compliance against. Never frame a finding as a violation, for example never write that something is clearly not what they claim it is. Instead, note where the current execution may not yet fully express that stated intent, phrased as something worth their attention, not a fault.\n\nVisual and verbal norms vary by industry and audience segment, there is no single correct look or voice. Avoid absolute judgments about color, imagery, or type choices. Where something seems worth flagging, hedge it, for example this may skew from the audience described, or worth considering whether this is an intentional choice that could be articulated more clearly, rather than declaring it wrong.\n\nSome brands intentionally bridge two worlds, for example rustic and upscale, playful and expert, grassroots and institutional. The client was asked directly what worlds their business connects and where their offering sits between them, so check that answer first. If it, or the mission, or the how-they-want-to-be-perceived answer, points to a deliberate duality, don't read mixed or spanning signals in the visuals or the writing as a fault. Name the duality plainly in your findings instead, and reserve any concern for whether both sides of it are actually coming through clearly, not for the duality itself.\n\nYou will receive the client's company name and answers about their business, mission, values, audience, the worlds their business connects, and industry, plus uploaded images (their logo and or website and social screenshots, if provided).\n\nDo two independent reads.\n\nVISUAL READ. Look only at the images provided. In priority order, consider imagery and photography style, color, typography, layout, iconography, motion if visible, and whitespace, relative to general norms for the client's stated industry and audience, not a fixed standard. Produce 3 to 5 adjectives that describe the personality these choices actually project. Then write 2 to 3 sentences of findings citing specific things you see, framed as observations rather than verdicts. Note anything worth a second look as a short, hedged phrase, for example imagery that repeats or reads generic, no favicon or a default platform placeholder, a logo shown in a way that may not have been intended, strong default-AI-tool patterns like purple gradients or outlined buttons with no apparent connection to the brand, or a type pairing that may not be deliberate. Phrase each as worth reconsidering, not as a mistake.\n\nVERBAL READ. Look only at the client's text answers. If specific values weren't given directly, infer likely values from the stated mission or why answer instead, and don't treat the absence of a named values list as a gap, plenty of brands haven't put values into words yet. Produce 3 to 5 adjectives that describe the personality the writing projects. Then write 2 to 3 sentences of findings, framed as observations rather than verdicts. Note anything worth a second look as a short, hedged phrase, for example a claim of being different that isn't yet demonstrated, values named without much shown behind them yet, copy that seems to address several audiences at once, a target customer that isn't fully pinned down, or offerings described in general terms. Phrase each as worth tightening, not as a flaw.\n\nIf no images were provided, or an image is a generic loading placeholder, a blank page, or a login or consent wall rather than real brand content, say so plainly in visual findings rather than inventing a read. If a note explains that an automatic screenshot capture failed, say so plainly as well rather than inventing a read.\n\nReturn only valid JSON, no markdown fences, no extra text, in this exact shape:\n{\n  \"visual_tone\": [\"word\", \"word\", \"word\"],\n  \"visual_findings\": \"...\",\n  \"visual_red_flags\": [\"...\"],\n  \"verbal_tone\": [\"word\", \"word\", \"word\"],\n  \"verbal_findings\": \"...\",\n  \"verbal_red_flags\": [\"...\"]\n}\nUse empty arrays where nothing applies. Keep every string under 40 words.";
 
@@ -51,6 +36,22 @@ export async function onRequestPost(context) {
 
     const scoreResult = await callClaude(ALIGNMENT_SCORE_SYSTEM, [{ type: "text", text: scoreText }], 3000, env);
     const report = normalizeReport(visualVerbalResult, scoreResult, payload.companyName);
+
+    // The report already generated successfully at this point, so an
+    // email hiccup should never turn into a failed request and cost the
+    // person their result. Attempt delivery, then attach the outcome to
+    // the response so the front end can show whether it went out.
+    const toEmail = (payload.leadEmail || "").trim();
+    if (toEmail) {
+      try {
+        await sendReportEmail(env, { to: toEmail, name: payload.leadName, companyName: payload.companyName, report: report });
+        report.email = { sent: true, to: toEmail };
+      } catch (err) {
+        report.email = { sent: false, to: toEmail, error: err.message };
+      }
+    } else {
+      report.email = { sent: false, to: null, error: null };
+    }
 
     return new Response(JSON.stringify(report), {
       status: 200,

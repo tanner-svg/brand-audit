@@ -284,7 +284,6 @@ function freshState(){
     socialAttempt: 0,
     leadName: '',
     leadEmail: '',
-    leadSubmitting: false,
     leadError: '',
     report: null,
     errorMsg: ''
@@ -450,24 +449,35 @@ function render(){
   else if(state.screen === 'question') app.innerHTML = renderQuestion();
   else if(state.screen === 'followup-loading') app.innerHTML = renderMiniLoading("Reviewing your answers");
   else if(state.screen === 'assets') app.innerHTML = renderAssets();
-  else if(state.screen === 'lead') app.innerHTML = renderLead();
   else if(state.screen === 'generating') app.innerHTML = renderGenerating();
   else if(state.screen === 'report') app.innerHTML = renderReport();
   else if(state.screen === 'error') app.innerHTML = renderErrorScreen();
   bindEvents();
 }
 
-/* ---------- INTRO ---------- */
+/* ---------- INTRO / EMAIL GATE ---------- */
 function renderIntro(){
+  var nameVal = esc(state.leadName);
+  var emailVal = esc(state.leadEmail);
+  var errorHTML = state.leadError ? '<div class="field-error">' + esc(state.leadError) + '</div>' : '';
   return ''
   + '<div class="eyebrow">Nectarine Diagnostic</div>'
   + '<h1 class="h-intro">Brand Alignment<br>Audit</h1>'
   + '<p class="lede">A quick, honest read on whether your visual identity, your narrative, your market, and your audience actually point the same direction.</p>'
-  + '<p class="muted">About 6 minutes. A handful of short questions, then a website and a social link, this audit captures those live. Your logo is the only thing you\'ll need to upload.</p>'
+  + '<p class="muted">About 6 minutes. A handful of short questions, then a website and a social link, this audit captures those live. Your logo is the only thing you\'ll need to upload. Your full report is emailed to you when it\'s ready.</p>'
+  + '<div class="field">'
+  + '  <label>Your name</label>'
+  + '  <input type="text" id="lead-name-field" placeholder="Full name" value="' + nameVal + '">'
+  + '</div>'
+  + '<div class="field">'
+  + '  <label>Email</label>'
+  + '  <input type="email" id="lead-email-field" placeholder="you@company.com" value="' + emailVal + '">'
+  + '  ' + errorHTML
+  + '</div>'
   + '<div class="row-actions">'
   + '  <button class="btn btn-primary" id="start-btn">Begin the audit</button>'
   + '</div>'
-  + '<p class="mono small muted" style="margin-top:3rem;">Your answers and images are sent to Claude for analysis and used only to generate your report.</p>';
+  + '<p class="mono small muted" style="margin-top:3rem;">Your answers and images are sent to Claude for analysis. Your report is emailed to the address above and used only to generate and deliver your results.</p>';
 }
 
 /* ---------- COMPANY NAME ---------- */
@@ -548,30 +558,6 @@ function renderAssets(){
   + '<p class="mono small muted" style="margin-top:1.6rem;">Some sites and most social platforms occasionally block automatic capture. If a preview looks blank or stuck, use the upload option beneath it.</p>';
 }
 
-/* ---------- LEAD GATE ---------- */
-function renderLead(){
-  var nameVal = esc(state.leadName);
-  var emailVal = esc(state.leadEmail);
-  var errorHTML = state.leadError ? '<div class="field-error">' + esc(state.leadError) + '</div>' : '';
-  return ''
-  + '<div class="eyebrow">Last step</div>'
-  + '<h2 class="h-question">Where should we send it?</h2>'
-  + '<p class="muted">Your report generates right after this. Someone from Nectarine may follow up with a few notes.</p>'
-  + '<div class="field">'
-  + '  <label>Your name</label>'
-  + '  <input type="text" id="lead-name-field" placeholder="Full name" value="' + nameVal + '" autofocus>'
-  + '</div>'
-  + '<div class="field">'
-  + '  <label>Email</label>'
-  + '  <input type="email" id="lead-email-field" placeholder="you@company.com" value="' + emailVal + '">'
-  + '  ' + errorHTML
-  + '</div>'
-  + '<div class="row-actions">'
-  + '  <span class="link-btn btn-ghost" id="back-btn">← Back</span>'
-  + '  <button class="btn btn-primary" id="generate-btn"' + (state.leadSubmitting ? ' disabled' : '') + '>' + (state.leadSubmitting ? 'Sending…' : 'Generate my audit') + '</button>'
-  + '</div>';
-}
-
 /* ---------- GENERATING ---------- */
 function renderGenerating(){
   return '<div class="loading-wrap">'
@@ -586,7 +572,7 @@ function renderErrorScreen(){
   + '<h2 class="h-question">Something didn\'t load</h2>'
   + '<div class="error-box">' + esc(state.errorMsg || 'The audit ran into a problem generating your report.') + '</div>'
   + '<div class="row-actions">'
-  + '  <span class="link-btn btn-ghost" id="back-to-lead">← Back</span>'
+  + '  <span class="link-btn btn-ghost" id="back-to-assets">← Back</span>'
   + '  <button class="btn btn-primary" id="retry-btn">Try again</button>'
   + '</div>';
 }
@@ -619,6 +605,12 @@ function renderReport(){
     var icon = item.flagged ? '<span class="check-icon bad">✕</span>' : '<span class="check-icon good">✓</span>';
     return '<div class="check-row">' + icon + '<div><div class="check-label">'+esc(label)+'</div>' + (item.note ? '<div class="check-note">'+esc(item.note)+'</div>' : '') + '</div></div>';
   }).join('');
+  var emailNote = '';
+  if(r.email && r.email.sent){
+    emailNote = '<p class="mono small muted" style="margin-top:.6rem;">Also sent to ' + esc(r.email.to) + '.</p>';
+  } else if(r.email && r.email.to && !r.email.sent){
+    emailNote = '<p class="mono small muted" style="margin-top:.6rem;">This report is saved above, but the emailed copy to ' + esc(r.email.to) + ' didn\'t go through.</p>';
+  }
   var fuzzSourceBlock = (r.fuzz_source && r.overall_score !== 'Aligned') ? ''
     + '<div class="section">'
     + '  <div class="section-num mono">06 — WHERE THE FUZZ IS COMING FROM</div>'
@@ -633,6 +625,7 @@ function renderReport(){
   + '  <div class="score-caption">' + scoreCaption(r.overall_score) + '</div>'
   + '</div>'
   + '<p class="lede">' + esc(r.snapshot) + '</p>'
+  + emailNote
 
   + '<div class="section">'
   + '  <div class="section-num mono">01 — VISUAL IDENTITY</div>'
@@ -680,9 +673,25 @@ function renderReport(){
 /* ---------- EVENTS ---------- */
 function bindEvents(){
   if(state.screen === 'intro'){
-    document.getElementById('start-btn').onclick = function(){
-      state.screen = 'company'; render();
-    };
+    var nameField = document.getElementById('lead-name-field');
+    var emailField = document.getElementById('lead-email-field');
+    emailField.focus();
+    function tryStart(){
+      state.leadName = nameField.value.trim();
+      state.leadEmail = emailField.value.trim();
+      if(!isValidEmail(state.leadEmail)){
+        state.leadError = 'Add a valid email to continue.';
+        render();
+        return;
+      }
+      state.leadError = '';
+      state.screen = 'company';
+      render();
+    }
+    emailField.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ tryStart(); }
+    });
+    document.getElementById('start-btn').onclick = tryStart;
   }
   else if(state.screen === 'company'){
     var field = document.getElementById('company-field');
@@ -751,26 +760,6 @@ function bindEvents(){
       var socialField = document.getElementById('social-field');
       if(siteField) state.site = normalizeUrl(siteField.value);
       if(socialField) state.social = normalizeUrl(socialField.value);
-      state.screen = 'lead';
-      render();
-    };
-  }
-  else if(state.screen === 'lead'){
-    var nameField = document.getElementById('lead-name-field');
-    var emailField = document.getElementById('lead-email-field');
-    document.getElementById('back-btn').onclick = function(){
-      state.leadName = nameField.value; state.leadEmail = emailField.value;
-      state.screen = 'assets'; render();
-    };
-    document.getElementById('generate-btn').onclick = function(){
-      state.leadName = nameField.value.trim();
-      state.leadEmail = emailField.value.trim();
-      if(!state.leadName || !isValidEmail(state.leadEmail)){
-        state.leadError = !state.leadName ? 'Add your name to continue.' : 'Add a valid email to continue.';
-        render();
-        return;
-      }
-      state.leadError = '';
       submitLeadThenGenerate();
     };
   }
@@ -784,7 +773,7 @@ function bindEvents(){
   }
   else if(state.screen === 'error'){
     document.getElementById('retry-btn').onclick = function(){ generateReport(); };
-    document.getElementById('back-to-lead').onclick = function(){ state.screen = 'lead'; render(); };
+    document.getElementById('back-to-assets').onclick = function(){ state.screen = 'assets'; render(); };
   }
   else if(state.screen === 'report'){
     document.getElementById('restart-btn').onclick = function(){
@@ -834,7 +823,12 @@ function fetchFollowUps(){
 }
 
 function submitLeadThenGenerate(){
-  state.leadSubmitting = true;
+  // Email and name were already collected on the front page, so there is
+  // no separate lead screen to linger on here, this goes straight to the
+  // loading view and covers both the CRM call and the report generation
+  // that follows it.
+  clearInterval(loadingTimer);
+  state.screen = 'generating';
   render();
   fetch('/api/lead', {
     method: 'POST',
@@ -848,7 +842,6 @@ function submitLeadThenGenerate(){
   })
   .catch(function(){ /* a CRM hiccup shouldn't block the report the person was promised */ })
   .then(function(){
-    state.leadSubmitting = false;
     generateReport();
   });
 }
@@ -865,7 +858,9 @@ function generateReport(){
     social: state.social || null,
     logo: state.logo ? { data: state.logo.data, media_type: state.logo.media_type } : null,
     siteOverride: state.siteOverride ? { data: state.siteOverride.data, media_type: state.siteOverride.media_type } : null,
-    socialOverride: state.socialOverride ? { data: state.socialOverride.data, media_type: state.socialOverride.media_type } : null
+    socialOverride: state.socialOverride ? { data: state.socialOverride.data, media_type: state.socialOverride.media_type } : null,
+    leadEmail: state.leadEmail || null,
+    leadName: state.leadName || null
   };
 
   fetch('/api/report', {
