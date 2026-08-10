@@ -106,6 +106,24 @@ export const CHECKLIST_LABELS = [
   "A clear grid system underlies the layout"
 ];
 
+// Which uploaded asset(s) each checklist item depends on. An item is
+// only judged if at least one required asset was actually provided,
+// otherwise report.js marks it not_applicable instead of guessing.
+export const CHECKLIST_ASSET_REQUIREMENTS = [
+  ["site"],           // Buttons are consistent in size, shape, and style
+  ["site"],           // Buttons and links work as expected
+  ["site"],           // The site resizes well across devices
+  ["logo"],           // The logo stays legible at small scale
+  ["logo"],           // The logo holds up cleanly at large scale
+  ["site", "social"], // Colors and fonts stay consistent across posts and pages
+  ["site", "social"], // Images feel consistent, not generic stock
+  ["site"],           // A favicon is set on the website
+  ["social"],         // The social grid or cover images have a visual rhythm
+  ["site", "social"], // Writing style stays consistent across pages and posts
+  ["site"],           // Padding and text alignment are consistent
+  ["site"]            // A clear grid system underlies the layout
+];
+
 function escapeHtml(str) {
   if (str === null || str === undefined) return "";
   return String(str)
@@ -153,6 +171,7 @@ function conflictBlocks(conflicts) {
 function checklistRows(checklist) {
   return CHECKLIST_LABELS.map(function (label, i) {
     var item = (checklist && checklist[i]) || { flagged: false, note: "" };
+    if (item.not_applicable) { return ""; }
     var icon = item.flagged
       ? '<span style="color:#D7432A;">&#10005;</span>'
       : '<span style="color:#1F5C55;">&#10003;</span>';
