@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brand Alignment Audit — Nectarine</title>
+<link rel="stylesheet" href="cursor.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&family=Aleo:ital,wght@0,400;0,500;0,700;1,400&display=swap');
 
@@ -15,6 +16,7 @@
   --line:#E1DDD0;
   --accent:#D7432A;
   --accent-soft:#F8DED5;
+  --warn:#B8860B;
   --teal:#1F5C55;
   --teal-soft:#E3EEEB;
   --font-display:'Belanosima', sans-serif;
@@ -206,6 +208,7 @@ input[type=text], input[type=email]{min-height:auto;}
 .check-row:last-child{border-bottom:none;}
 .check-icon{font-family:var(--font-mono); font-size:.85rem; width:1.1rem; flex-shrink:0; margin-top:.1rem;}
 .check-icon.bad{color:var(--accent);}
+.check-icon.warn{color:var(--warn);}
 .check-icon.good{color:var(--teal);}
 .check-label{font-size:.92rem;}
 .check-note{font-family:var(--font-mono); font-size:.72rem; color:var(--muted); margin-top:.15rem;}
@@ -238,7 +241,7 @@ var CORE_QUESTIONS = [
   { text: "Who is your ideal customer, and what problem are you solving for them?" },
   { text: "What different worlds, if any, does your business bridge: industries, audiences, traditions, price points, old and new? Where does your offer sit between them?" },
   { text: "Your industry, two or three brands you'd want to be compared against, and any way you want to be perceived that you're not confident you're achieving." },
-  { text: "Your core values, if you've put them into words.", skippable: true, skipNote: "(not specified, infer implied values from the mission or why answer above instead)" }
+  { text: "Your core values, if you've put them into words.", skipNote: "(not specified, infer implied values from the mission or why answer above instead)" }
 ];
 
 var CHECKLIST_LABELS = [
@@ -463,8 +466,7 @@ function renderIntro(){
   return ''
   + '<div class="eyebrow">Nectarine Diagnostic</div>'
   + '<h1 class="h-intro">Brand Alignment<br>Audit</h1>'
-  + '<p class="lede">A quick, honest read on whether your visual identity, your narrative, your market, and your audience actually point the same direction.</p>'
-  + '<p class="muted">Complete audit takes 5-8 minutes through 5 core questions and 2 follow ups to dig as deep as possible into your brand.</p>'
+  + '<p class="lede">Complete audit takes 5-8 minutes through 5 core questions and 2 follow ups to dig as deep as possible into your brand.</p>'
   + '<div class="field">'
   + '  <label>Your name</label>'
   + '  <input type="text" id="lead-name-field" placeholder="Full name" value="' + nameVal + '">'
@@ -502,7 +504,7 @@ function renderQuestion(){
   var q = state.questions[idx];
   var pct = Math.round(((idx) / total) * 100);
   var val = esc(state.answers[idx] || '');
-  var skipLink = q.skippable ? '<p style="margin-top:1rem;"><span class="link-btn btn-ghost" id="skip-btn">Skip — I haven\'t defined these yet</span></p>' : '';
+  var skipLink = '<p style="margin-top:1rem;"><span class="link-btn btn-ghost" id="skip-btn">Skip this question</span></p>';
   return ''
   + '<div class="progress-wrap">'
   + '  <div class="mono small muted">QUESTION ' + String(idx+1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0') + '</div>'
@@ -601,8 +603,11 @@ function renderReport(){
     return '<div class="consider-box"><div class="issue">'+esc(c.issue)+'</div><div class="example">'+esc(c.example)+'</div></div>';
   }).join('') : '<p class="mono small muted" style="margin-top:.6rem;">The visual and verbal reads broadly line up.</p>';
   var checklist = CHECKLIST_LABELS.map(function(label, i){
-    var item = (r.execution_checklist && r.execution_checklist[i]) || {flagged:false, note:''};
-    var icon = item.flagged ? '<span class="check-icon bad">✕</span>' : '<span class="check-icon good">✓</span>';
+    var item = (r.execution_checklist && r.execution_checklist[i]) || {severity:'ok', note:''};
+    if(item.not_applicable) { return ''; }
+    var icon = item.severity === 'issue' ? '<span class="check-icon bad">✕</span>'
+      : item.severity === 'warning' ? '<span class="check-icon warn">!</span>'
+      : '<span class="check-icon good">✓</span>';
     return '<div class="check-row">' + icon + '<div><div class="check-label">'+esc(label)+'</div>' + (item.note ? '<div class="check-note">'+esc(item.note)+'</div>' : '') + '</div></div>';
   }).join('');
   var emailNote = '';
@@ -658,7 +663,7 @@ function renderReport(){
 
   + '<div class="section">'
   + '  <div class="section-num mono">05 — EXECUTION AND CONSISTENCY</div>'
-  + '  <p class="mono small muted" style="margin-top:.5rem;">A check means this looks solid. A mark means it is worth a closer look.</p>'
+  + '  <p class="mono small muted" style="margin-top:.5rem;">A check means this looks solid. An exclamation is worth a look, not a confirmed problem. An x means there is clear evidence something is off.</p>'
   + '  <div style="margin-top:.8rem;">' + checklist + '</div>'
   + '</div>'
 
@@ -789,7 +794,7 @@ function buildAnswersPayload(){
     var ans = state.answers[i];
     var answerText;
     if(ans && ans.trim()){ answerText = ans; }
-    else { answerText = q.skippable ? q.skipNote : '(no answer given)'; }
+    else { answerText = q.skipNote || '(no answer given)'; }
     return { question: q.text, answer: answerText };
   });
 }
@@ -804,7 +809,7 @@ function fetchFollowUps(){
   .then(function(result){
     state.followUpsFetched = true;
     var qs = (result && result.questions) || [];
-    qs = qs.slice(0,2).map(function(q){ return {text: q, skippable: false}; });
+    qs = qs.slice(0,2).map(function(q){ return {text: q}; });
     if(qs.length > 0){
       state.questions = state.questions.concat(qs);
       state.answers = state.answers.concat(qs.map(function(){ return ''; }));
@@ -887,5 +892,6 @@ function generateReport(){
 render();
 })();
 </script>
+<script src="cursor.js" defer></script>
 </body>
 </html>
