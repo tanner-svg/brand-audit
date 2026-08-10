@@ -1,0 +1,18 @@
+name = "brand-audit"
+main = "functions/worker.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Secrets (set these with `wrangler secret put <NAME>`, do not put real
+# values in this file): ANTHROPIC_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN,
+# HUBSPOT_TOKEN, RESEND_API_KEY
+
+# Plain vars, not secrets, safe to keep in the repo. RESEND_FROM_EMAIL
+# must be on a domain verified in Resend or delivery will fail.
+# RESEND_CC_EMAILS is comma separated, set it to "" to send with no CC.
+[vars]
+RESEND_FROM_EMAIL = "Nectarine Brand Audit <audit@nectarine.ink>"
+RESEND_CC_EMAILS = "hello@nectarine.ink"
