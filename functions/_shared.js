@@ -170,10 +170,12 @@ function conflictBlocks(conflicts) {
 
 function checklistRows(checklist) {
   return CHECKLIST_LABELS.map(function (label, i) {
-    var item = (checklist && checklist[i]) || { flagged: false, note: "" };
+    var item = (checklist && checklist[i]) || { severity: "ok", note: "" };
     if (item.not_applicable) { return ""; }
-    var icon = item.flagged
+    var icon = item.severity === "issue"
       ? '<span style="color:#D7432A;">&#10005;</span>'
+      : item.severity === "warning"
+      ? '<span style="color:#B8860B;">!</span>'
       : '<span style="color:#1F5C55;">&#10003;</span>';
     var note = item.note ? '<div style="font-size:11px;color:#83806F;margin-top:2px;">' + escapeHtml(item.note) + "</div>" : "";
     return '<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #E1DDD0;width:20px;vertical-align:top;">' + icon + "</td>"

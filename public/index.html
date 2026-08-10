@@ -15,6 +15,7 @@
   --line:#E1DDD0;
   --accent:#D7432A;
   --accent-soft:#F8DED5;
+  --warn:#B8860B;
   --teal:#1F5C55;
   --teal-soft:#E3EEEB;
   --font-display:'Belanosima', sans-serif;
@@ -206,6 +207,7 @@ input[type=text], input[type=email]{min-height:auto;}
 .check-row:last-child{border-bottom:none;}
 .check-icon{font-family:var(--font-mono); font-size:.85rem; width:1.1rem; flex-shrink:0; margin-top:.1rem;}
 .check-icon.bad{color:var(--accent);}
+.check-icon.warn{color:var(--warn);}
 .check-icon.good{color:var(--teal);}
 .check-label{font-size:.92rem;}
 .check-note{font-family:var(--font-mono); font-size:.72rem; color:var(--muted); margin-top:.15rem;}
@@ -464,7 +466,7 @@ function renderIntro(){
   + '<div class="eyebrow">Nectarine Diagnostic</div>'
   + '<h1 class="h-intro">Brand Alignment<br>Audit</h1>'
   + '<p class="lede">A quick, honest read on whether your visual identity, your narrative, your market, and your audience actually point the same direction.</p>'
-  + '<p class="muted">Complete audit takes 5-8 minutes through 5 core questions and 2 follow ups to dig as deep as possible into your brand.</p>'
+  + '<p class="muted">About 6 minutes. A handful of short questions, then a website and a social link, this audit captures those live. Your logo is the only thing you\'ll need to upload. Your full report is emailed to you when it\'s ready.</p>'
   + '<div class="field">'
   + '  <label>Your name</label>'
   + '  <input type="text" id="lead-name-field" placeholder="Full name" value="' + nameVal + '">'
@@ -477,7 +479,7 @@ function renderIntro(){
   + '<div class="row-actions">'
   + '  <button class="btn btn-primary" id="start-btn">Begin the audit</button>'
   + '</div>'
-  + '<p class="mono small muted" style="margin-top:3rem;"></p>';
+  + '<p class="mono small muted" style="margin-top:3rem;">Your answers and images are sent to Claude for analysis. Your report is emailed to the address above and used only to generate and deliver your results.</p>';
 }
 
 /* ---------- COMPANY NAME ---------- */
@@ -601,9 +603,11 @@ function renderReport(){
     return '<div class="consider-box"><div class="issue">'+esc(c.issue)+'</div><div class="example">'+esc(c.example)+'</div></div>';
   }).join('') : '<p class="mono small muted" style="margin-top:.6rem;">The visual and verbal reads broadly line up.</p>';
   var checklist = CHECKLIST_LABELS.map(function(label, i){
-    var item = (r.execution_checklist && r.execution_checklist[i]) || {flagged:false, note:''};
+    var item = (r.execution_checklist && r.execution_checklist[i]) || {severity:'ok', note:''};
     if(item.not_applicable) { return ''; }
-    var icon = item.flagged ? '<span class="check-icon bad">✕</span>' : '<span class="check-icon good">✓</span>';
+    var icon = item.severity === 'issue' ? '<span class="check-icon bad">✕</span>'
+      : item.severity === 'warning' ? '<span class="check-icon warn">!</span>'
+      : '<span class="check-icon good">✓</span>';
     return '<div class="check-row">' + icon + '<div><div class="check-label">'+esc(label)+'</div>' + (item.note ? '<div class="check-note">'+esc(item.note)+'</div>' : '') + '</div></div>';
   }).join('');
   var emailNote = '';
@@ -659,7 +663,7 @@ function renderReport(){
 
   + '<div class="section">'
   + '  <div class="section-num mono">05 — EXECUTION AND CONSISTENCY</div>'
-  + '  <p class="mono small muted" style="margin-top:.5rem;">A check means this looks solid. A mark means it is worth a closer look.</p>'
+  + '  <p class="mono small muted" style="margin-top:.5rem;">A check means this looks solid. An exclamation is worth a look, not a confirmed problem. An x means there is clear evidence something is off.</p>'
   + '  <div style="margin-top:.8rem;">' + checklist + '</div>'
   + '</div>'
 
