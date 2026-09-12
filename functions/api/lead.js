@@ -20,7 +20,7 @@ const COLUMN_SOURCE = "color_mkyb8krc";
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  if (!env.MONDAY_API_TOKEN) {
+  if (!env.MONDAY_TOKEN) {
     return new Response(JSON.stringify({ ok: false, reason: "not configured" }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
@@ -70,7 +70,7 @@ async function mondayRequest(env, query, variables) {
   const resp = await fetch("https://api.monday.com/v2", {
     method: "POST",
     headers: {
-      "Authorization": env.MONDAY_API_TOKEN,
+      "Authorization": env.MONDAY_TOKEN,
       "Content-Type": "application/json",
       "API-Version": "2024-10"
     },

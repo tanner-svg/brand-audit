@@ -8,7 +8,7 @@ binding = "ASSETS"
 
 # Secrets (set these with `wrangler secret put <NAME>`, do not put real
 # values in this file): ANTHROPIC_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN,
-# MONDAY_API_TOKEN, RESEND_API_KEY
+# MONDAY_TOKEN, RESEND_API_KEY
 
 # Plain vars, not secrets, safe to keep in the repo. RESEND_FROM_EMAIL
 # must be on a domain verified in Resend or delivery will fail.
