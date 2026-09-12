@@ -1,19 +1,26 @@
 // POST /api/lead
 // Fires the moment someone passes the email gate, before the report
-// generates. Creates (or updates, if they've filled this out before) a
-// HubSpot contact, then attaches a note with their survey answers.
+// generates. Creates (or updates, if they've filled this out before) an
+// item on Nectarine's Monday.com "Leads" board, then attaches an update
+// with their survey answers.
 //
-// This intentionally does not create a Deal. Nectarine's pipeline starts
-// at "Lead" and the $500 audit is a flat-rate product, so if you'd like
-// this to also drop a Deal into that stage, fill in HUBSPOT_PIPELINE_ID,
-// HUBSPOT_STAGE_ID, and the audit product's ID below and uncomment
-// createDeal(). Find those IDs in HubSpot under Settings > Objects >
-// Deals > Pipelines, and in your product catalog.
+// Migrated from HubSpot after that account was dissolved. Board and
+// column IDs below are specific to the "Leads" board
+// (https://nectarine.monday.com, board id 5102469972) and were confirmed
+// against the live board schema: lead_status has a "New Lead" option and
+// color_mkyb8krc ("Lead Source") already has an "AI Audit" option, both
+// used as the defaults for a new item here.
+
+const MONDAY_BOARD_ID = "5102469972";
+const COLUMN_EMAIL = "lead_email";
+const COLUMN_COMPANY = "lead_company";
+const COLUMN_STATUS = "lead_status";
+const COLUMN_SOURCE = "color_mkyb8krc";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  if (!env.HUBSPOT_TOKEN) {
+  if (!env.MONDAY_API_TOKEN) {
     return new Response(JSON.stringify({ ok: false, reason: "not configured" }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
@@ -36,21 +43,18 @@ export async function onRequestPost(context) {
   }
 
   try {
-    const contactId = await upsertContact(env, { name: name, email: email, companyName: companyName });
+    const itemId = await upsertLead(env, { name: name, email: email, companyName: companyName });
 
     const noteBody = buildNoteBody(companyName, body.answers);
     try {
-      await attachNote(env, contactId, noteBody);
+      await attachUpdate(env, itemId, noteBody);
     } catch (noteErr) {
-      // The contact matters more than the note. If HubSpot's association
-      // type ID ever changes on their end, don't let that break lead
-      // capture, just log it lost rather than failing the whole request.
+      // The lead item matters more than the note. Don't let a hiccup on
+      // the update call fail lead capture, just log it lost rather than
+      // failing the whole request.
     }
 
-    // Uncomment to also create a Deal in the Lead stage:
-    // await createDeal(env, contactId, companyName);
-
-    return new Response(JSON.stringify({ ok: true, contactId: contactId }), {
+    return new Response(JSON.stringify({ ok: true, itemId: itemId }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });
@@ -62,80 +66,72 @@ export async function onRequestPost(context) {
   }
 }
 
-async function upsertContact(env, lead) {
-  const nameParts = lead.name.split(" ");
-  const firstname = nameParts[0] || lead.name;
-  const lastname = nameParts.slice(1).join(" ");
-
-  const properties = { email: lead.email };
-  if (firstname) { properties.firstname = firstname; }
-  if (lastname) { properties.lastname = lastname; }
-  if (lead.companyName) { properties.company = lead.companyName; }
-
-  const createResp = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+async function mondayRequest(env, query, variables) {
+  const resp = await fetch("https://api.monday.com/v2", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer " + env.HUBSPOT_TOKEN,
-      "Content-Type": "application/json"
+      "Authorization": env.MONDAY_API_TOKEN,
+      "Content-Type": "application/json",
+      "API-Version": "2024-10"
     },
-    body: JSON.stringify({ properties: properties })
+    body: JSON.stringify({ query: query, variables: variables })
   });
 
-  if (createResp.ok) {
-    const data = await createResp.json();
-    return data.id;
+  const data = await resp.json().catch(function () { return {}; });
+  if (!resp.ok || data.errors) {
+    const msg = (data.errors && data.errors[0] && data.errors[0].message) || resp.statusText;
+    throw new Error("Monday.com request failed (" + resp.status + "): " + msg);
   }
-
-  if (createResp.status === 409) {
-    const errData = await createResp.json().catch(function () { return {}; });
-    const existingId = extractExistingId(errData);
-    if (existingId) {
-      await fetch("https://api.hubapi.com/crm/v3/objects/contacts/" + existingId, {
-        method: "PATCH",
-        headers: {
-          "Authorization": "Bearer " + env.HUBSPOT_TOKEN,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ properties: properties })
-      });
-      return existingId;
-    }
-  }
-
-  const text = await createResp.text().catch(function () { return ""; });
-  throw new Error("HubSpot contact upsert failed (" + createResp.status + "): " + text.slice(0, 300));
+  return data.data;
 }
 
-function extractExistingId(errData) {
-  const msg = (errData && errData.message) || "";
-  const match = msg.match(/Existing ID:\s*(\d+)/i);
-  return match ? match[1] : null;
+async function findLeadIdByEmail(env, email) {
+  const query = "query($boardId: ID!, $email: CompareValue!) {"
+    + " boards(ids: [$boardId]) {"
+    + "   items_page(query_params: { rules: [{ column_id: \"" + COLUMN_EMAIL + "\", compare_value: $email, operator: contains_text }] }, limit: 1) {"
+    + "     items { id }"
+    + "   }"
+    + " }"
+    + "}";
+  const data = await mondayRequest(env, query, { boardId: MONDAY_BOARD_ID, email: email });
+  const items = (data.boards[0] && data.boards[0].items_page.items) || [];
+  return items.length ? items[0].id : null;
 }
 
-async function attachNote(env, contactId, noteBody) {
-  const resp = await fetch("https://api.hubapi.com/crm/v3/objects/notes", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + env.HUBSPOT_TOKEN,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      properties: {
-        hs_note_body: noteBody,
-        hs_timestamp: Date.now()
-      },
-      associations: [
-        {
-          to: { id: contactId },
-          types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 202 }]
-        }
-      ]
-    })
+async function upsertLead(env, lead) {
+  const existingId = await findLeadIdByEmail(env, lead.email);
+
+  const columnValues = {};
+  columnValues[COLUMN_EMAIL] = { email: lead.email, text: lead.email };
+  if (lead.companyName) { columnValues[COLUMN_COMPANY] = lead.companyName; }
+
+  if (existingId) {
+    const mutation = "mutation($itemId: ID!, $boardId: ID!, $columnValues: JSON!) {"
+      + " change_multiple_column_values(item_id: $itemId, board_id: $boardId, column_values: $columnValues) { id }"
+      + "}";
+    await mondayRequest(env, mutation, { itemId: existingId, boardId: MONDAY_BOARD_ID, columnValues: JSON.stringify(columnValues) });
+    return existingId;
+  }
+
+  columnValues[COLUMN_STATUS] = { label: "New Lead" };
+  columnValues[COLUMN_SOURCE] = { label: "AI Audit" };
+
+  const mutation = "mutation($boardId: ID!, $itemName: String!, $columnValues: JSON!) {"
+    + " create_item(board_id: $boardId, item_name: $itemName, column_values: $columnValues) { id }"
+    + "}";
+  const data = await mondayRequest(env, mutation, {
+    boardId: MONDAY_BOARD_ID,
+    itemName: lead.name || lead.companyName || lead.email,
+    columnValues: JSON.stringify(columnValues)
   });
-  if (!resp.ok) {
-    const text = await resp.text().catch(function () { return ""; });
-    throw new Error("HubSpot note create failed (" + resp.status + "): " + text.slice(0, 300));
-  }
+  return data.create_item.id;
+}
+
+async function attachUpdate(env, itemId, noteBody) {
+  const mutation = "mutation($itemId: ID!, $body: String!) {"
+    + " create_update(item_id: $itemId, body: $body) { id }"
+    + "}";
+  await mondayRequest(env, mutation, { itemId: itemId, body: noteBody });
 }
 
 function buildNoteBody(companyName, answers) {
@@ -145,27 +141,3 @@ function buildNoteBody(companyName, answers) {
   });
   return lines.join("\n");
 }
-
-// async function createDeal(env, contactId, companyName) {
-//   const HUBSPOT_PIPELINE_ID = "";
-//   const HUBSPOT_STAGE_ID = ""; // the "Lead" stage
-//   const resp = await fetch("https://api.hubapi.com/crm/v3/objects/deals", {
-//     method: "POST",
-//     headers: {
-//       "Authorization": "Bearer " + env.HUBSPOT_TOKEN,
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify({
-//       properties: {
-//         dealname: (companyName || "New lead") + " — Brand Alignment Audit",
-//         pipeline: HUBSPOT_PIPELINE_ID,
-//         dealstage: HUBSPOT_STAGE_ID,
-//         amount: "500"
-//       },
-//       associations: [
-//         { to: { id: contactId }, types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 3 }] }
-//       ]
-//     })
-//   });
-//   if (!resp.ok) { throw new Error("HubSpot deal create failed (" + resp.status + ")"); }
-// }
