@@ -270,7 +270,7 @@ function freshState(){
     leadName: '',
     leadEmail: '',
     leadError: '',
-    report: null,
+    showContinueLink: false,
     errorMsg: ''
   };
 }
@@ -543,10 +543,32 @@ function renderAssets(){
 
 /* ---------- GENERATING ---------- */
 function renderGenerating(){
+  var fallbackLink = state.showContinueLink
+    ? '<p class="mono small muted" style="margin-top:1.4rem;">Taking a while to move on? <a href="' + AUDIT_COMPLETE_URL + '" target="_top">Click here to continue</a>.</p>'
+    : '';
   return '<div class="loading-wrap">'
   + '<div class="loading-word">Nectarine</div>'
   + '<div class="loading-msg" id="loading-msg">' + LOADING_MESSAGES[0] + '</div>'
+  + fallbackLink
   + '</div>';
+}
+
+// This tool runs embedded in an iframe on nectarine.ink, so a plain
+// window.location.href only navigates the iframe itself, leaving the
+// visitor stuck looking at the confirmation page through a small frame.
+// window.top.location targets the real top-level page instead. Writing
+// to it is allowed cross-origin even though reading it isn't, unless the
+// embedding page's iframe is sandboxed without top-navigation permission,
+// which fails silently, so a manual link is shown after a short delay as
+// a fallback in case the automatic redirect didn't go anywhere.
+var AUDIT_COMPLETE_URL = 'https://nectarine.ink/audit-complete';
+function redirectTopTo(url){
+  try{ (window.top || window).location.href = url; }
+  catch(e){ window.location.href = url; }
+  setTimeout(function(){
+    state.showContinueLink = true;
+    if(state.screen === 'generating'){ render(); }
+  }, 1800);
 }
 
 /* ---------- ERROR ---------- */
@@ -734,6 +756,7 @@ function submitLeadThenGenerate(){
 function generateReport(){
   clearInterval(loadingTimer);
   state.screen = 'generating';
+  state.showContinueLink = false;
   render();
 
   var payload = {
@@ -758,7 +781,7 @@ function generateReport(){
     // The server queues up the report and email in the background from
     // here, so there is nothing further to wait on before sending the
     // person on to the confirmation page.
-    window.location.href = 'https://nectarine.ink/audit-complete';
+    redirectTopTo(AUDIT_COMPLETE_URL);
   })
   .catch(function(){
     state.errorMsg = "Your audit couldn't get started. This sometimes happens with a slow connection or a very large image. Try again, or go back and upload a screenshot instead.";
