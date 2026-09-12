@@ -194,7 +194,7 @@ function emailSection(title, innerHtml) {
 // to sign the email as someone else on the team; it only affects this
 // greeting and sign-off, not the From address (see RESEND_FROM_EMAIL in
 // wrangler.toml, which controls what inbox replies actually land in).
-const SENDER_NAME = "Tanner";
+const SENDER_NAME = "Solomon";
 
 // Renders the audit result as a self-contained HTML email (inline styles
 // only, since most mail clients strip a <style> block). Written to read
@@ -217,7 +217,7 @@ export function buildReportEmailHTML(name, companyName, report) {
     + '<div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1.5px solid #3E0000;border-radius:999px;display:inline-block;padding:6px 14px;">Nectarine Diagnostic</div>'
     + '<h1 style="font-family:Georgia,serif;font-size:24px;margin:16px 0 4px;">' + brand + "</h1>"
     + '<p style="font-size:15px;margin:16px 0 0;">' + greeting + "</p>"
-    + '<p style="font-size:15px;margin:10px 0 20px;">Thanks for taking the time to run ' + brand + ' through our Brand Alignment Audit. I went through everything you shared and put the full breakdown together below, take a look when you get a chance.</p>'
+    + '<p style="font-size:15px;margin:10px 0 20px;">Thanks for taking the time to run ' + brand + ' through our Brand Alignment Audit. We went through everything you shared and put the full breakdown together below, take a look when you get a chance.</p>'
     + '<div style="font-family:Georgia,serif;font-weight:700;font-size:34px;color:' + scoreCol + ';">' + escapeHtml(report.overall_score) + "</div>"
     + '<p style="font-style:italic;font-size:15px;margin-top:10px;">' + escapeHtml(report.snapshot) + "</p>"
 
@@ -246,14 +246,14 @@ export function buildReportEmailHTML(name, companyName, report) {
     + fuzzSource
 
     + emailSection("WANT TO TALK THROUGH ANY OF THIS?",
-        '<p style="font-size:14px;margin-top:8px;">Happy to walk through the findings together and help you think through next steps, no pressure either way.</p>'
+        '<p style="font-size:14px;margin-top:8px;">We would be happy to walk through the findings together and help you think through next steps, no pressure either way.</p>'
         + '<div style="margin-top:16px;">'
         + '<a href="https://calendar.app.google/7PP2JtLPDtK5qhiw5" style="display:inline-block;background:#D7432A;color:#ffffff;font-family:Georgia,serif;font-size:14px;text-decoration:none;padding:12px 22px;border-radius:10px;margin:0 10px 10px 0;">Schedule a Free Call</a>'
         + '<a href="https://nectarine.ink" style="display:inline-block;background:#ffffff;color:#3E0000;font-family:Georgia,serif;font-size:14px;text-decoration:none;padding:12px 22px;border-radius:10px;border:1.5px solid #3E0000;">Learn What We Do</a>'
         + '</div>')
 
     + '<p style="font-size:14px;margin-top:32px;">Talk soon,<br>' + escapeHtml(SENDER_NAME) + '<br>Nectarine</p>'
-    + '<p style="font-size:12px;color:#83806F;margin-top:24px;text-align:center;">Reply to this email any time, it comes straight to me.</p>'
+    + '<p style="font-size:12px;color:#83806F;margin-top:24px;text-align:center;">Reply to this email any time, it comes straight to us.</p>'
     + "</div>"
     + "</div>";
 }
