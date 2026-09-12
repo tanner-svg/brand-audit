@@ -14,5 +14,5 @@ binding = "ASSETS"
 # must be on a domain verified in Resend or delivery will fail.
 # RESEND_CC_EMAILS is comma separated, set it to "" to send with no CC.
 [vars]
-RESEND_FROM_EMAIL = "Nectarine Brand Audit <audit@nectarine.ink>"
+RESEND_FROM_EMAIL = "Tanner at Nectarine <hello@nectarine.ink>"
 RESEND_CC_EMAILS = "hello@nectarine.ink"

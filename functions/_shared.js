@@ -190,13 +190,21 @@ function emailSection(title, innerHtml) {
     + "</div>";
 }
 
+// The name and role this report appears to come from. Change SENDER_NAME
+// to sign the email as someone else on the team; it only affects this
+// greeting and sign-off, not the From address (see RESEND_FROM_EMAIL in
+// wrangler.toml, which controls what inbox replies actually land in).
+const SENDER_NAME = "Tanner";
+
 // Renders the audit result as a self-contained HTML email (inline styles
-// only, since most mail clients strip a <style> block). Mirrors the
-// sections shown on the report screen in public/index.html, just laid
-// out for reading in an inbox instead of a browser.
+// only, since most mail clients strip a <style> block). Written to read
+// like a note from SENDER_NAME personally sharing the results, since the
+// email is now the only place a client sees their audit (the web tool
+// redirects to nectarine.ink/audit-complete instead of showing it inline).
 export function buildReportEmailHTML(name, companyName, report) {
   var firstName = (name || "").trim().split(" ")[0];
-  var greeting = firstName ? "Hi " + escapeHtml(firstName) + "," : "Hi,";
+  var greeting = firstName ? "Hi " + escapeHtml(firstName) + "," : "Hi there,";
+  var brand = escapeHtml(report.business_name || companyName || "your brand");
   var scoreCol = scoreColor(report.overall_score);
 
   var fuzzSource = (report.fuzz_source && report.overall_score !== "Aligned")
@@ -207,8 +215,9 @@ export function buildReportEmailHTML(name, companyName, report) {
     + '<div style="font-family:Georgia,serif;color:#3E0000;background:#FCF8F3;padding:32px 20px;">'
     + '<div style="max-width:600px;margin:0 auto;background:#FFFFFF;padding:32px;border:1px solid #E1DDD0;">'
     + '<div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1.5px solid #3E0000;border-radius:999px;display:inline-block;padding:6px 14px;">Nectarine Diagnostic</div>'
-    + '<h1 style="font-family:Georgia,serif;font-size:24px;margin:16px 0 4px;">' + escapeHtml(report.business_name || companyName || "Your brand") + "</h1>"
-    + '<p style="font-size:14px;color:#83806F;margin:0 0 20px;">' + greeting + " your Brand Alignment Audit is ready.</p>"
+    + '<h1 style="font-family:Georgia,serif;font-size:24px;margin:16px 0 4px;">' + brand + "</h1>"
+    + '<p style="font-size:15px;margin:16px 0 0;">' + greeting + "</p>"
+    + '<p style="font-size:15px;margin:10px 0 20px;">Thanks for taking the time to run ' + brand + ' through our Brand Alignment Audit. I went through everything you shared and put the full breakdown together below, take a look when you get a chance.</p>'
     + '<div style="font-family:Georgia,serif;font-weight:700;font-size:34px;color:' + scoreCol + ';">' + escapeHtml(report.overall_score) + "</div>"
     + '<p style="font-style:italic;font-size:15px;margin-top:10px;">' + escapeHtml(report.snapshot) + "</p>"
 
@@ -236,7 +245,15 @@ export function buildReportEmailHTML(name, companyName, report) {
 
     + fuzzSource
 
-    + '<p style="font-size:12px;color:#83806F;margin-top:32px;text-align:center;">Sent by Nectarine. Reply to this email with any questions.</p>'
+    + emailSection("WANT TO TALK THROUGH ANY OF THIS?",
+        '<p style="font-size:14px;margin-top:8px;">Happy to walk through the findings together and help you think through next steps, no pressure either way.</p>'
+        + '<div style="margin-top:16px;">'
+        + '<a href="https://calendar.app.google/7PP2JtLPDtK5qhiw5" style="display:inline-block;background:#D7432A;color:#ffffff;font-family:Georgia,serif;font-size:14px;text-decoration:none;padding:12px 22px;border-radius:10px;margin:0 10px 10px 0;">Schedule a Free Call</a>'
+        + '<a href="https://nectarine.ink" style="display:inline-block;background:#ffffff;color:#3E0000;font-family:Georgia,serif;font-size:14px;text-decoration:none;padding:12px 22px;border-radius:10px;border:1.5px solid #3E0000;">Learn What We Do</a>'
+        + '</div>')
+
+    + '<p style="font-size:14px;margin-top:32px;">Talk soon,<br>' + escapeHtml(SENDER_NAME) + '<br>Nectarine</p>'
+    + '<p style="font-size:12px;color:#83806F;margin-top:24px;text-align:center;">Reply to this email any time, it comes straight to me.</p>'
     + "</div>"
     + "</div>";
 }

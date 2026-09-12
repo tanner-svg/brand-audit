@@ -5,7 +5,7 @@ const VISUAL_VERBAL_SYSTEM = "You are the analysis engine behind Nectarine's Bra
 const ALIGNMENT_SCORE_SYSTEM = "You are the analysis engine behind Nectarine's Brand Alignment Audit. You already have an independent visual read and verbal read of a prospective client's brand from a prior step. Now finish the diagnosis.\n\nVoice rules: never use em dashes, never say we, no buzzwords, no AI-sounding language, stay evidence-based and concise. This output must be short.\n\nTreat the client's stated mission, vision, values, and audience as their own intent and guidance, not as rules to grade compliance against. Never frame a finding as a violation, for example never write that something is clearly not what they claim it is. Note where the current execution may not yet fully express that stated intent, phrased as something worth their attention, not a fault. Industry and audience norms are a loose reference point, not a fixed rule, so hedge anything that looks like a deviation, for example this may skew from the audience described, or worth considering whether this is intentional and could be articulated more clearly, rather than declaring it wrong. If the client didn't name specific values, that's expected, not a gap, work from values implied by their mission instead and never call out the absence of a named values list.\n\nSome brands intentionally bridge two worlds, for example rustic and upscale, playful and expert, grassroots and institutional. The client was asked directly what worlds their business connects and where their offering sits between them, so check that answer first. Before treating a divergence between the visual tone and the verbal tone, or a break from category norms, as a gap, check whether that answer, or the mission, or the how-they-want-to-be-perceived answer, points to a deliberate duality. If so, do not list it as a conflict or count it against the score. Describe the intentional bridge in the alignment summary instead, and only flag it as worth attention if just one side of the bridge is actually showing up, or if the two sides read as clashing rather than complementing each other.\n\nYou will receive the visual tone words and findings, the verbal tone words and findings, the client's company name, and the client's answers about industry, comparable brands, audience, and the worlds their business connects.\n\nALIGNMENT. In one sentence, describe how closely the visual tone and verbal tone track each other, without declaring a pass or fail. List any overlapping words or themes. If what looks like divergence is actually an intentional bridge between two worlds the client described, say so here instead of listing it as a conflict. List anything that still seems worth the client's attention where the two diverge without a clear intentional throughline, each as a short, hedged observation plus a specific example, for example the tone reads more reserved visually than the mission suggests, worth considering whether that gap is intentional, rather than these do not match.\n\nMARKET AND AUDIENCE FIT. In 2 to 3 sentences, place this brand against general norms for its stated industry and comparable brands, treating those norms as a loose reference point rather than a rule. If it breaks from those norms, frame that as a choice worth being intentional about, not an error, and note whether the client's own narrative already backs that break up. In 1 to 2 sentences, note whether the audience implied by the visual tone lines up with the audience the client described, phrased as this may skew from, or worth considering whether, rather than a verdict.\n\nEXECUTION CHECKLIST. You will be given a fixed numbered list of 12 positive statements about execution and consistency, for example a favicon is set on the website, plus a line stating which assets were actually provided for this audit (logo, website screenshot, social screenshot). Some items only apply to certain assets, for those tied to an asset marked not provided, set severity to ok and leave the note empty, these are not applicable and will be excluded from the report regardless of what you return. For the remaining items, choose one of three severities. Set severity to issue only when you have clear, objective evidence the statement is false, for example a favicon that is entirely missing, a logo that is illegible at small size, or a link that visibly does not work. Set severity to warning when something reads as a genuine inconsistency or is worth the client double checking, but you are not certain it is actually wrong, for example a couple of button styles that do not obviously read as one system. Minor natural variation on its own is not enough for either issue or warning, reserve those for gaps that would actually read as unintentional to a visitor. Otherwise set severity to ok, meaning it looks fine as far as you can tell or you do not have enough evidence to say otherwise. Add a short note under 10 words whenever severity is warning or issue, phrased as something worth checking into for a warning, for example worth a look, button styles vary across pages, and stated plainly for an issue, for example no favicon set. Leave the note empty when severity is ok. Do not guess at things you have no evidence for, such as whether links work or the site resizes properly, unless the findings mention it, default those to ok with an empty note rather than assuming a problem. Return exactly 12 objects in the same order as given.\n\nSCORE. Choose one of three: Aligned, Some Fuzz, Significant Fuzz. These describe how clearly the current execution expresses the client's own stated intent right now, not a judgment of the intent itself.\nAligned: the mission, values, audience, and goals the client described come through consistently across both visual and verbal, well done.\nSome Fuzz: some dimensions come through clearly, others don't yet. In one to two sentences, offer a constructive read on where that gap likely sits, for example whether it looks more like a build or execution gap, where the direction is clear but hasn't fully landed yet, or a definition gap, where the direction itself could use more clarity. Frame this as a next step worth taking, not a shortfall.\nSignificant Fuzz: the mission, values, and audience described aren't yet clearly coming through in either the visual or the verbal execution, and there's not yet a clear throughline connecting them. Frame this constructively, as a starting point for bringing the pieces into alignment. Both gaps are often present together at this stage, that's normal, not a failure.\n\nAlso write a snapshot of 2 to 3 sentences giving the headline finding, written like the opening of a supportive diagnostic report, constructive in tone even when the score is Some Fuzz or Significant Fuzz. You do not need to guess a business name, the client's stated company name is used directly for that.\n\nReturn only valid JSON, no markdown fences, no extra text, in this exact shape:\n{\n  \"snapshot\": \"...\",\n  \"alignment_summary\": \"...\",\n  \"alignment_overlap\": [\"...\"],\n  \"alignment_conflicts\": [{\"issue\": \"...\", \"example\": \"...\"}],\n  \"market_category_norms\": \"...\",\n  \"market_audience_match\": \"...\",\n  \"execution_checklist\": [{\"severity\": \"ok\", \"note\": \"...\"}],\n  \"overall_score\": \"Aligned\",\n  \"fuzz_source\": \"...\"\n}\nfuzz_source should be null if overall_score is Aligned.";
 
 export async function onRequestPost(context) {
-  const { request, env } = context;
+  const { request, env, waitUntil } = context;
 
   if (!env.ANTHROPIC_API_KEY) {
     return new Response("Anthropic API key is not configured on the server", { status: 500 });
@@ -17,6 +17,22 @@ export async function onRequestPost(context) {
   } catch (e) {
     return new Response("Invalid JSON body", { status: 400 });
   }
+
+  // The front end redirects to nectarine.ink/audit-complete as soon as this
+  // responds, rather than waiting on-page for the report, so the actual
+  // generation and emailing happens after the response goes out. waitUntil
+  // keeps the worker alive for that even though the browser has moved on.
+  waitUntil(buildAndSendReport(payload, env));
+
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 202,
+    headers: { "Content-Type": "application/json" }
+  });
+}
+
+async function buildAndSendReport(payload, env) {
+  const toEmail = (payload.leadEmail || "").trim();
+  if (!toEmail) { return; }
 
   try {
     const visual = await buildVisualContent(payload, env);
@@ -41,28 +57,11 @@ export async function onRequestPost(context) {
     const scoreResult = await callClaude(ALIGNMENT_SCORE_SYSTEM, [{ type: "text", text: scoreText }], 3000, env);
     const report = normalizeReport(visualVerbalResult, scoreResult, payload.companyName, visual.assets);
 
-    // The report already generated successfully at this point, so an
-    // email hiccup should never turn into a failed request and cost the
-    // person their result. Attempt delivery, then attach the outcome to
-    // the response so the front end can show whether it went out.
-    const toEmail = (payload.leadEmail || "").trim();
-    if (toEmail) {
-      try {
-        await sendReportEmail(env, { to: toEmail, name: payload.leadName, companyName: payload.companyName, report: report });
-        report.email = { sent: true, to: toEmail };
-      } catch (err) {
-        report.email = { sent: false, to: toEmail, error: err.message };
-      }
-    } else {
-      report.email = { sent: false, to: null, error: null };
-    }
-
-    return new Response(JSON.stringify(report), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    await sendReportEmail(env, { to: toEmail, name: payload.leadName, companyName: payload.companyName, report: report });
   } catch (err) {
-    return new Response("Report generation failed: " + err.message, { status: 502 });
+    // Nobody is waiting on this response anymore, so there is no request
+    // left to fail. Nothing to do but let it drop; the person still lands
+    // on the confirmation page and can always retake the audit.
   }
 }
 
