@@ -234,10 +234,18 @@ input[type=text], input[type=email]{min-height:auto;}
 }
 .cta-buttons{display:flex; gap:1rem; justify-content:center; margin-top:1.6rem;}
 .cta-btn{
-  flex:1 1 0; max-width:260px; text-align:center; text-decoration:none; display:inline-block;
+  position:relative; overflow:hidden; flex:1 1 0; max-width:260px; text-align:center; text-decoration:none; display:inline-block;
 }
+.cta-btn:hover{filter:none;}
+.cta-btn::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; background:var(--bg);
+  clip-path:circle(0% at 0% 50%); transition:clip-path .5s ease-in-out; pointer-events:none;
+}
+.cta-btn:hover::before{clip-path:circle(150% at 0% 50%);}
+.cta-btn-label{position:relative; z-index:1; transition:color .5s ease-in-out;}
+.cta-btn:hover .cta-btn-label{color:var(--ink);}
 .cta-btn-secondary{background:transparent; color:var(--bg); border:1.5px solid var(--bg);}
-.cta-btn-secondary:hover{background:rgba(255,255,255,.08);}
+.cta-btn-secondary:hover{border-color:var(--bg);}
 .cta-restart-link{
   display:inline-block; margin-top:1.6rem; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em;
   color:var(--bg); text-decoration:underline; cursor:pointer; background:none; border:none; padding:0;
@@ -699,8 +707,8 @@ function renderReport(){
   + '  <div class="cta-preheader">Interested in more?</div>'
   + '  <div class="cta-headline">We\'d love to discuss your findings with you and help bring your next step to life!</div>'
   + '  <div class="cta-buttons">'
-  + '    <a class="btn btn-primary cta-btn" href="https://calendar.app.google/7PP2JtLPDtK5qhiw5" target="_blank" rel="noopener">Schedule a Free Call</a>'
-  + '    <a class="btn cta-btn cta-btn-secondary" href="https://nectarine.ink" target="_blank" rel="noopener">Learn What We Do</a>'
+  + '    <a class="btn btn-primary cta-btn" href="https://calendar.app.google/7PP2JtLPDtK5qhiw5" target="_blank" rel="noopener"><span class="cta-btn-label">Schedule a Free Call</span></a>'
+  + '    <a class="btn cta-btn cta-btn-secondary" href="https://nectarine.ink" target="_blank" rel="noopener"><span class="cta-btn-label">Learn What We Do</span></a>'
   + '  </div>'
   + '  <button class="cta-restart-link" id="restart-btn">Run Another Audit</button>'
   + '</div>'
