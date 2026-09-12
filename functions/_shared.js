@@ -274,7 +274,7 @@ export async function sendReportEmail(env, options) {
     throw new Error("Email delivery is not configured (missing RESEND_API_KEY)");
   }
 
-  var from = env.RESEND_FROM_EMAIL || "Nectarine Brand Audit <audit@nectarine.ink>";
+  var from = env.RESEND_FROM_EMAIL || "hello@nectarine.ink";
   var cc = (env.RESEND_CC_EMAILS !== undefined ? env.RESEND_CC_EMAILS : "hello@nectarine.ink")
     .split(",")
     .map(function (e) { return e.trim(); })
