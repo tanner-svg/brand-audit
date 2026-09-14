@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Nectarine</title>
+<meta name="description" content="We are a creative studio developing timeless, world-class brands for holistic, impact-driven companies. Meet the team, our mission, and how we think.">
+<link rel="stylesheet" href="cursor.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&family=Aleo:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
+:root{
+  --bg:#FCF8F3;
+  --surface:#FFFFFF;
+  --ink:#3E0000;
+  --muted:#83806F;
+  --line:#E1DDD0;
+  --accent:#D7432A;
+  --accent-soft:#F8DED5;
+  --warn:#B8860B;
+  --teal:#1F5C55;
+  --teal-soft:#E3EEEB;
+  --font-display:'Belanosima', sans-serif;
+  --font-body:'Aleo', Georgia, serif;
+  --font-mono:'Aleo', Georgia, serif;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+::selection{background:var(--accent-soft);}
+img{max-width:100%;}
+
+.wrap{max-width:1120px; margin:0 auto; padding:0 clamp(1.25rem, 4vw, 2.5rem);}
+
+.eyebrow{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-weight:600;
+  font-size:.7rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink);
+  border:1.5px solid var(--ink);
+  border-radius:999px;
+  padding:.5rem 1.2rem;
+}
+h1,h2,h3{
+  font-family:var(--font-display);
+  font-weight:600;
+  letter-spacing:-0.01em;
+  margin:0;
+}
+.h-section{font-size:clamp(1.6rem, 4vw, 2.2rem); line-height:1.1;}
+p{line-height:1.65; margin:0.8rem 0 0;}
+.lede{font-size:1.1rem; font-style:italic; color:var(--ink); margin-top:.9rem;}
+.muted{color:var(--muted);}
+.mono{font-family:var(--font-mono);}
+.small{font-size:.8rem;}
+a{color:var(--ink);}
+
+.btn{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:.92rem;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  border:none;
+  border-radius:16px;
+  padding:1rem 2.2rem;
+  cursor:pointer;
+  transition:transform .12s ease, filter .15s ease, opacity .15s ease;
+}
+.btn-primary{background:var(--accent); color:#fff;}
+.btn-primary:hover{filter:brightness(0.88);}
+.btn-primary:active{transform:translateY(1px);}
+.btn-ghost{
+  background:none;
+  font-family:var(--font-mono);
+  font-size:.78rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink);
+  border:1.5px solid var(--line);
+  border-radius:999px;
+  padding:.65rem 1.3rem;
+}
+.btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+.btn-text{
+  background:none; border:none; padding:0; cursor:pointer;
+  font-family:var(--font-mono); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); text-decoration:underline; text-underline-offset:3px;
+}
+.btn-text:hover{color:var(--ink);}
+
+.section{padding:clamp(3.5rem,8vw,6rem) 0; scroll-margin-top:5rem;}
+.section-top-line{border-top:1px solid var(--line);}
+.section-head{max-width:640px;}
+
+/* ---------- HEADER ---------- */
+.site-header{
+  position:sticky; top:0; z-index:40;
+  background:rgba(252,248,243,.92); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+.site-header .wrap{display:flex; align-items:center; justify-content:space-between; padding-top:1rem; padding-bottom:1rem;}
+.wordmark{font-family:var(--font-display); font-weight:600; font-size:1.15rem; text-decoration:none; color:var(--ink);}
+.site-nav{display:flex; align-items:center; gap:1.6rem;}
+.site-nav a{
+  font-family:var(--font-mono); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); text-decoration:none;
+}
+.site-nav a:hover{color:var(--ink);}
+.site-nav .btn{padding:.65rem 1.4rem; font-size:.72rem;}
+.nav-links{display:flex; gap:1.6rem;}
+@media (max-width:640px){ .nav-links{display:none;} }
+
+/* ---------- HERO SCROLL ---------- */
+.hero-scroll{position:relative;}
+.hero-pin{
+  min-height:70vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(3rem,10vw,6rem) 0;
+  text-align:center;
+}
+.hero-inner{max-width:900px; margin:0 auto;}
+.hero-kicker{margin-bottom:1.2rem;}
+.hero-sentence{
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(1.7rem, 5vw, 2.9rem); line-height:1.22; letter-spacing:-0.01em;
+  margin:0;
+}
+.hs-word{display:inline-block; transition:color .4s ease;}
+.hs-keep{color:var(--ink);}
+.hero-scroll.scrollytell .hs-keep.is-lit{color:var(--accent);}
+.hero-connector{
+  width:1px; height:0; background:var(--accent); margin:1.5rem auto 0;
+}
+.hero-nectar{margin-top:1.6rem;}
+.hero-nectar-label{
+  font-family:var(--font-display); font-weight:600; color:var(--accent);
+  font-size:clamp(1.25rem, 3.4vw, 1.7rem); margin:0;
+}
+.hero-nectar-note{
+  max-width:620px; margin:.9rem auto 0; color:var(--muted); font-style:italic; font-size:.98rem;
+}
+.hero-nectar-cite{margin-top:.7rem; color:var(--muted);}
+
+/* JS-enhanced pinned state */
+.hero-scroll.scrollytell{height:240vh;}
+.hero-scroll.scrollytell .hero-pin{position:sticky; top:0; height:100vh; min-height:0; overflow:hidden;}
+.hero-scroll.scrollytell .hero-nectar{opacity:0; transform:translateY(16px);}
+@media (max-width:640px){
+  .hero-scroll.scrollytell{height:200vh;}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-scroll.scrollytell{height:auto;}
+  .hero-scroll.scrollytell .hero-pin{position:static; height:auto;}
+  .hero-scroll.scrollytell .hero-nectar{opacity:1; transform:none;}
+}
+
+/* ---------- MISSION / VISION ---------- */
+.mv-row{
+  display:grid; grid-template-columns:1fr 3fr; gap:clamp(1.5rem,4vw,3rem);
+  padding:2.4rem 0; border-top:1px solid var(--line);
+}
+.mv-row:last-child{border-bottom:1px solid var(--line);}
+.mv-label{padding-top:.2rem;}
+.mv-statement{
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(1.3rem, 3vw, 1.7rem); line-height:1.3; margin:0;
+}
+.mv-body .btn-ghost{margin-top:1.4rem;}
+@media (max-width:720px){
+  .mv-row{grid-template-columns:1fr;}
+}
+
+/* ---------- HOW WE THINK CAROUSEL ---------- */
+.carousel{position:relative; margin-top:2.4rem;}
+.carousel-track{
+  display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:0;
+}
+.carousel-track::-webkit-scrollbar{display:none;}
+.value-slide{
+  flex:0 0 100%; scroll-snap-align:start;
+  display:grid; grid-template-columns:1fr 1.3fr; gap:clamp(1.5rem,4vw,3rem);
+  align-items:center; padding:.2rem .2rem 1rem;
+}
+.value-media{
+  aspect-ratio:4/3; border:1px solid var(--line); background:var(--accent-soft);
+  display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+}
+.value-slide:nth-child(even) .value-media{background:var(--teal-soft);}
+.value-media svg{width:38%; height:38%; opacity:.85;}
+.value-media .media-tag{
+  position:absolute; bottom:.6rem; left:.6rem;
+  font-family:var(--font-mono); font-size:.62rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); background:rgba(255,255,255,.7); padding:.2rem .5rem;
+}
+.value-copy h3{font-size:clamp(1.2rem,2.6vw,1.5rem);}
+.value-copy .pull-quote{
+  margin-top:1rem; padding-left:.9rem; border-left:2px solid var(--accent);
+  font-style:italic; color:var(--ink);
+}
+.value-copy .btn-text{display:inline-block; margin-top:1.1rem;}
+@media (max-width:720px){
+  .value-slide{grid-template-columns:1fr;}
+}
+
+.carousel-controls{display:flex; align-items:center; justify-content:center; gap:1.4rem; margin-top:1.6rem;}
+.carousel-arrow{
+  width:2.4rem; height:2.4rem; border-radius:50%; border:1.5px solid var(--line); background:var(--surface);
+  font-family:var(--font-mono); font-size:1rem; cursor:pointer; color:var(--ink);
+  display:flex; align-items:center; justify-content:center; transition:border-color .15s ease, color .15s ease;
+}
+.carousel-arrow:hover{border-color:var(--accent); color:var(--accent);}
+.carousel-dots{display:flex; gap:.5rem;}
+.carousel-dot{
+  width:7px; height:7px; border-radius:50%; background:var(--line); border:none; padding:0; cursor:pointer;
+}
+.carousel-dot.is-active{background:var(--accent); width:18px; border-radius:4px; transition:width .2s ease;}
+
+/* ---------- TEAM ---------- */
+.team-grid{
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:1.6rem; margin-top:2.4rem;
+}
+.team-card{
+  background:var(--surface); border:1px solid var(--line); padding:1.8rem 1.5rem; text-align:center;
+}
+.team-avatar{
+  width:84px; height:84px; border-radius:50%; margin:0 auto;
+  background:var(--accent-soft); color:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:600; font-size:1.25rem;
+}
+.team-card:nth-child(3n-1) .team-avatar{background:var(--teal-soft); color:var(--teal);}
+.team-card:nth-child(3n) .team-avatar{background:var(--line); color:var(--ink);}
+.team-name{margin-top:1rem; font-size:1.1rem;}
+.team-title{
+  font-family:var(--font-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); margin-top:.3rem;
+}
+.team-divider{border:none; border-top:1px solid var(--line); margin:1.1rem 0;}
+.team-fave-label{
+  font-family:var(--font-mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+}
+.fave-list{list-style:none; margin:.6rem 0 0; padding:0; text-align:left;}
+.fave-list li{
+  font-size:.88rem; padding-left:1rem; position:relative; margin-top:.4rem; line-height:1.4;
+}
+.fave-list li::before{content:'•'; color:var(--accent); position:absolute; left:0;}
+.fave-empty{font-size:.85rem; font-style:italic; color:var(--muted); margin-top:.6rem;}
+@media (max-width:860px){ .team-grid{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:560px){ .team-grid{grid-template-columns:1fr;} }
+
+/* ---------- FOOTER / CONTACT ---------- */
+.contact-band{background:var(--accent-soft);}
+.contact-band .wrap{
+  padding:clamp(3rem,7vw,4.5rem) clamp(1.25rem,4vw,2.5rem);
+  text-align:center;
+}
+.contact-band .lede{font-size:1.3rem;}
+.contact-band a.mailto{
+  display:inline-block; margin-top:1.1rem;
+  font-family:var(--font-display); font-weight:600; font-size:1.3rem; color:var(--accent); text-decoration:none;
+}
+.contact-band a.mailto:hover{text-decoration:underline;}
+.site-footer{padding:2rem 0; text-align:center;}
+.site-footer .small{color:var(--muted);}
+
+/* ---------- MODAL ---------- */
+.modal-overlay{
+  position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center;
+  padding:1.5rem; background:rgba(62,0,0,.55);
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+.modal-overlay.is-open{opacity:1; pointer-events:auto;}
+.modal-card{
+  background:var(--surface); width:100%; max-width:620px; max-height:82vh; overflow-y:auto;
+  padding:clamp(1.6rem,4vw,2.6rem); position:relative;
+  transform:translateY(14px); transition:transform .25s ease;
+}
+.modal-overlay.is-open .modal-card{transform:translateY(0);}
+.modal-close{
+  position:absolute; top:1rem; right:1rem; background:none; border:none; cursor:pointer;
+  font-family:var(--font-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); padding:.5rem .6rem;
+}
+.modal-close:hover{color:var(--ink);}
+.modal-card h3{font-size:1.3rem; padding-right:2rem;}
+.modal-card p{font-size:.98rem;}
+.modal-cite{margin-top:1.2rem; color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="/">Nectarine</a>
+    <nav class="site-nav" aria-label="Page sections">
+      <div class="nav-links">
+        <a href="#mission">Mission</a>
+        <a href="#how-we-think">How We Think</a>
+        <a href="#team">Team</a>
+      </div>
+      <a class="btn btn-primary" href="/">Start Your Audit</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ---------- HERO ---------- -->
+  <section class="hero-scroll" id="heroScroll">
+    <div class="hero-pin">
+      <div class="wrap hero-inner">
+        <div class="hero-kicker eyebrow">We Are Nectarine</div>
+        <p class="hero-sentence" id="heroSentence">
+          <span class="hs-word">We</span> <span class="hs-word">are</span> <span class="hs-word">a</span>
+          <span class="hs-word">creative</span> <span class="hs-word">studio</span> <span class="hs-word">developing</span>
+          <span class="hs-word hs-keep" id="heroKeepWord">timeless,</span>
+          <span class="hs-word">world-class</span> <span class="hs-word">brands</span> <span class="hs-word">for</span>
+          <span class="hs-word">holistic,</span> <span class="hs-word">impact-driven</span> <span class="hs-word">companies.</span>
+        </p>
+        <div class="hero-connector" id="heroConnector"></div>
+        <div class="hero-nectar" id="heroNectar">
+          <p class="hero-nectar-label">"Nektar" — the drink of eternal life, immortality, overcoming death.</p>
+          <p class="hero-nectar-note">Nectar is often mentioned alongside ambrosia, the food of the Greek and Roman gods — to the ancients, nectar and ambrosia gave the gods their immortality. In Greek, <em>nektar</em> is believed to combine <em>nek-</em> ("death") and <em>-tar</em> ("he overcomes, or crosses over").</p>
+          <p class="hero-nectar-cite mono small">— Merriam-Webster</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- MISSION / VISION ---------- -->
+  <section class="section section-top-line" id="mission">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Why We're Here</div>
+      </div>
+
+      <div class="mv-row">
+        <div class="mv-label"><div class="eyebrow">Our Mission</div></div>
+        <div class="mv-body">
+          <p class="mv-statement">To elevate the creative expression of people who change the world.</p>
+          <p class="muted">We believe the most powerful force for change in the world is people working together toward something that matters — teams that do right by their people, invest in their communities, and care about what they're putting into the world while they're building something great.</p>
+          <button class="btn btn-ghost" data-modal="mission">Read the full story →</button>
+        </div>
+      </div>
+
+      <div class="mv-row">
+        <div class="mv-label"><div class="eyebrow">Our Vision</div></div>
+        <div class="mv-body">
+          <p class="mv-statement">That by empowering the creative expression of our clients and team, they'll grow wildly, access dream opportunities, and use their passions to transform their communities and workplaces in love.</p>
+          <button class="btn btn-ghost" data-modal="vision">Read the full story →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- HOW WE THINK ---------- -->
+  <section class="section section-top-line" id="how-we-think">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">How We Think</div>
+        <h2 class="h-section" style="margin-top:.8rem;">The values our team operates by</h2>
+        <p class="muted">It's nice to know the people you work with. Here's a bit about how we think.</p>
+      </div>
+
+      <div class="carousel">
+        <div class="carousel-track" id="valueTrack"></div>
+        <div class="carousel-controls">
+          <button class="carousel-arrow" id="valuePrev" aria-label="Previous value">←</button>
+          <div class="carousel-dots" id="valueDots"></div>
+          <button class="carousel-arrow" id="valueNext" aria-label="Next value">→</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- TEAM ---------- -->
+  <section class="section section-top-line" id="team">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">The People @ Nectarine</div>
+        <h2 class="h-section" style="margin-top:.8rem;">Meet the team</h2>
+      </div>
+      <div class="team-grid" id="teamGrid"></div>
+    </div>
+  </section>
+
+</main>
+
+<div class="contact-band">
+  <div class="wrap">
+    <p class="lede">We love a good conversation.</p>
+    <a class="mailto" href="mailto:hello@nectarine.ink">Say hello → hello@nectarine.ink</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="mono small">© <span id="year"></span> Nectarine.</p>
+  </div>
+</footer>
+
+<!-- ---------- MODAL ---------- -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" data-modal-close aria-label="Close">✕ Close</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ================= DATA ================= */
+
+var VALUES = [
+  {
+    title: "Caring Means Helping Others Grow",
+    body: "We don't care to just deliver work. We aim to invest in the people behind every project — checking in on well-being, sharing the “why” behind decisions, and creating space for every teammate and client to grow.",
+    icon: 'heart',
+    modal: {
+      title: "Caring Means Helping Others Grow",
+      body: "<p>“To care for another, in the most significant sense, is to help him grow and actualize himself…. It is the antithesis of simply using the other person to satisfy one’s own needs. The meaning of caring I want to suggest is not to be confused with such meanings as wishing well, liking, comforting, or simply having an interest in what happens to another… Caring, as helping another grow and actualize himself, is a process, a way of relating to someone that involves development in the same way that friendship can only emerge through mutual trust and a deepening and qualitative transformation of the relationship. But besides caring for people we may care for other things as well. We may care, for instance, for our ‘brain child’ (a philosophical or artistic idea), an ideal or a community. And here too, whatever the important differences are between caring for a person and caring for an idea, I would like to show that there is a common pattern of helping the other grow.”</p>",
+      cite: "— Milton Mayeroff, On Caring"
+    }
+  },
+  {
+    title: "Beauty Will Save the World",
+    body: "Beauty has an innate power to communicate to the whole world — across cultures, languages, regions, barriers. We aim to steward beauty well: to bring transformation in communities, create resilience in hope, build connections, and nurture opportunities for redemption.",
+    icon: 'bloom',
+    pullQuote: "“Beauty would save the world.” — Fyodor Dostoyevsky"
+  },
+  {
+    title: "Variety Adds Flavor",
+    body: "We don't want differences in perspective to divide us — we want them to add depth and flavor that makes our team stronger. We see misalignment not as failure, but as the friction necessary to spark creativity and innovation.",
+    icon: 'fruit',
+    modal: {
+      title: "Variety Adds Flavor",
+      body: "<p>“So, here tonight we have apples and oranges… We're all different, but in the end, we're all fruit.”</p>",
+      cite: "— Gus Portokalos, My Big Fat Greek Wedding"
+    }
+  },
+  {
+    title: "Build Real Friendships",
+    body: "At Nectarine, we want to build friendships and relationships that last. People matter most — the people on our team, the people we serve, the people in our communities. We invest our time and resources generously in building and strengthening those friendships.",
+    icon: 'friends'
+  },
+  {
+    title: "Invested in Eternity",
+    body: "The root of Nectarine is “Nektar,” Greek for “overcoming death,” or “the drink of eternal life.” We believe people carry eternal value, so the work we do and the art we create should be worthy of our time — sparking joy, hope, creativity, and connection in the lives of those we serve.",
+    icon: 'infinity'
+  }
+];
+
+var TEAM = [
+  { name: "Shay Germany", title: "CEO, Founder", faves: ["Warm Sunshine", "Yellow Butterflies", "Family", "Snack Breaks", "Laugh So Hard It Hurts (With Friends)"] },
+  { name: "Tanner Germany", title: "Art Director, Co-Owner", faves: ["Coffee With Friends / Family", "Finding Rabbit Holes", "Beauty (Art In All Its Forms)", "Wholesome Moments", "The Sound Of Fresh Bread Out Of The Oven"] },
+  { name: "Tochukwu", title: "Project Manager", faves: [] },
+  { name: "Sara", title: "Creative", faves: [] },
+  { name: "Clarissa", title: "Administrative Assistant", faves: [] },
+  { name: "", title: "Growth & Relationships Lead", faves: [] }
+];
+
+var MODAL_CONTENT = {
+  mission: {
+    title: "Our Mission — What Do You Mean?",
+    body: "<p>We believe the most powerful force for change in the world is people working together toward something that matters. We see that most clearly in the business teams and organizations that are just as serious about their impact as they are about their growth… teams that do right by their people, invest in their communities, and care about what they're putting into the world while they're building something great.</p>"
+        + "<p>Those are the teams we want to come alongside.</p>"
+        + "<p>And we believe that when those teams communicate beautifully — when their story is told with clarity, intention, and craft — it doesn't just help them reach their goals. It creates something new in the world. Beauty has a unique power to move people, to build belief, and to open doors that logic alone can't. When we help mission-driven leaders steward that well, the work doesn't just look good. It does good.</p>"
+  },
+  vision: {
+    title: "Our Vision — What Do You Mean?",
+    body: "<p>We want to see our clients and our team genuinely thrive, not just professionally, but in the fullest sense of the word. When a brand finally has the clarity, story, and visual identity to match the quality of the work behind it, something unlocks. Doors open. The right opportunities show up. People step into their work with more confidence and conviction.</p>"
+        + "<p>We want to be the launchpad for that… the creative foundation that helped a company cross into their million or billion dollar years, that helped a young creative discover what they were capable of, that gave a founder the language to finally walk into the room and own it. Not because we handed them something, but because we saw what was already there (their strengths, their passions, their gifts) and helped them articulate it in a way the rest of the world can understand.</p>"
+        + "<p>We believe there are gifts in the people we work with that are waiting to be called out. And we believe that when people are empowered to carry those gifts with confidence, the impact doesn't stop with them. It spills into their teams, their communities, the lives of the people around them. We want to see our clients succeed wildly, and we want that success to be a blessing to the world they touch.</p>"
+  }
+};
+
+var ICONS = {
+  heart: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M24 40C24 40 6 29 6 16.8C6 10.8 10.6 6.5 16 6.5C19.6 6.5 22.6 8.4 24 11.2C25.4 8.4 28.4 6.5 32 6.5C37.4 6.5 42 10.8 42 16.8C42 29 24 40 24 40Z"/></svg>',
+  bloom: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="24" cy="24" r="6"/><path d="M24 18C24 12 20 8 24 4C28 8 24 12 24 18Z"/><path d="M24 30C24 36 20 40 24 44C28 40 24 36 24 30Z"/><path d="M18 24C12 24 8 20 4 24C8 28 12 24 18 24Z"/><path d="M30 24C36 24 40 20 44 24C40 28 36 24 30 24Z"/></svg>',
+  fruit: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="19" cy="27" r="11"/><circle cx="33" cy="27" r="8"/><path d="M19 16C19 10 22 7 26 6"/></svg>',
+  friends: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="17" cy="16" r="6"/><circle cx="33" cy="16" r="6"/><path d="M6 40C6 31 11 26 17 26C23 26 28 31 28 40"/><path d="M22 40C22 32 26.5 27.5 33 27.5C39.5 27.5 44 32 44 40"/></svg>',
+  infinity: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 24C14 18 18 15 22 15C28 15 28 33 34 33C38 33 38 24 38 24C38 24 38 15 34 15C28 15 28 33 22 33C18 33 14 30 14 24Z"/></svg>'
+};
+
+/* ================= HERO SCROLL ================= */
+
+(function heroScroll(){
+  var section = document.getElementById('heroScroll');
+  var keepWord = document.getElementById('heroKeepWord');
+  var connector = document.getElementById('heroConnector');
+  var nectar = document.getElementById('heroNectar');
+  var words = Array.prototype.slice.call(section.querySelectorAll('.hs-word:not(.hs-keep)'));
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return; // leave the static, fully-visible fallback markup as-is
+
+  section.classList.add('scrollytell');
+
+  var ticking = false;
+  function update(){
+    ticking = false;
+    var rect = section.getBoundingClientRect();
+    var total = section.offsetHeight - window.innerHeight;
+    if (total <= 0) return;
+    var scrolled = -rect.top;
+    var progress = Math.min(1, Math.max(0, scrolled / total));
+
+    var fadeP = Math.min(1, progress / 0.5);
+    words.forEach(function(w){
+      w.style.opacity = String(1 - fadeP);
+      w.style.filter = 'blur(' + (fadeP * 6) + 'px)';
+    });
+    keepWord.style.transform = 'scale(' + (1 + fadeP * 0.12) + ')';
+    keepWord.classList.toggle('is-lit', fadeP > 0.3);
+
+    var connectorP = Math.max(0, Math.min(1, (progress - 0.45) / 0.25));
+    connector.style.height = (connectorP * 36) + 'px';
+
+    var nectarP = Math.max(0, Math.min(1, (progress - 0.6) / 0.4));
+    nectar.style.opacity = String(nectarP);
+    nectar.style.transform = 'translateY(' + ((1 - nectarP) * 16) + 'px)';
+  }
+  function onScroll(){
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  update();
+})();
+
+/* ================= HOW WE THINK CAROUSEL ================= */
+
+(function valuesCarousel(){
+  var track = document.getElementById('valueTrack');
+  var dotsWrap = document.getElementById('valueDots');
+  var prevBtn = document.getElementById('valuePrev');
+  var nextBtn = document.getElementById('valueNext');
+
+  track.innerHTML = VALUES.map(function(v, i){
+    var extra = '';
+    if (v.modal) {
+      extra = '<button class="btn-text" data-modal="value-' + i + '">Read the quote →</button>';
+    } else if (v.pullQuote) {
+      extra = '<p class="pull-quote mono small">' + v.pullQuote + '</p>';
+    }
+    return ''
+      + '<div class="value-slide">'
+      + '  <div class="value-media">' + ICONS[v.icon] + '<span class="media-tag">Photo placeholder</span></div>'
+      + '  <div class="value-copy">'
+      + '    <h3>' + v.title + '</h3>'
+      + '    <p>' + v.body + '</p>'
+      + extra
+      + '  </div>'
+      + '</div>';
+  }).join('');
+
+  VALUES.forEach(function(v, i){
+    if (v.modal) MODAL_CONTENT['value-' + i] = v.modal;
+  });
+
+  dotsWrap.innerHTML = VALUES.map(function(_, i){
+    return '<button class="carousel-dot" data-index="' + i + '" aria-label="Go to value ' + (i + 1) + '"></button>';
+  }).join('');
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+  var slides = Array.prototype.slice.call(track.children);
+
+  function setActive(i){
+    dots.forEach(function(d, di){ d.classList.toggle('is-active', di === i); });
+  }
+  function goTo(i){
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    track.scrollTo({ left: slides[i].offsetLeft, behavior: 'smooth' });
+  }
+
+  prevBtn.addEventListener('click', function(){
+    goTo(currentIndex() - 1);
+  });
+  nextBtn.addEventListener('click', function(){
+    goTo(currentIndex() + 1);
+  });
+  dots.forEach(function(d){
+    d.addEventListener('click', function(){ goTo(parseInt(d.getAttribute('data-index'), 10)); });
+  });
+
+  function currentIndex(){
+    var left = track.scrollLeft;
+    var closest = 0, closestDist = Infinity;
+    slides.forEach(function(s, i){
+      var dist = Math.abs(s.offsetLeft - left);
+      if (dist < closestDist) { closestDist = dist; closest = i; }
+    });
+    return closest;
+  }
+
+  var scrollTicking = false;
+  track.addEventListener('scroll', function(){
+    if (!scrollTicking) {
+      requestAnimationFrame(function(){ setActive(currentIndex()); scrollTicking = false; });
+      scrollTicking = true;
+    }
+  }, { passive: true });
+
+  setActive(0);
+})();
+
+/* ================= TEAM GRID ================= */
+
+(function team(){
+  var grid = document.getElementById('teamGrid');
+
+  function initials(name){
+    if (!name) return '?';
+    var parts = name.trim().split(/\s+/);
+    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  }
+
+  grid.innerHTML = TEAM.map(function(person){
+    var favesHTML = person.faves.length
+      ? '<ul class="fave-list">' + person.faves.map(function(f){ return '<li>' + f + '</li>'; }).join('') + '</ul>'
+      : '<p class="fave-empty">Favorites coming soon.</p>';
+    var nameHTML = person.name ? '<h3 class="team-name">' + person.name + '</h3>' : '<h3 class="team-name">&nbsp;</h3>';
+    return ''
+      + '<div class="team-card">'
+      + '  <div class="team-avatar">' + initials(person.name) + '</div>'
+      + nameHTML
+      + '  <div class="team-title">' + person.title + '</div>'
+      + '  <hr class="team-divider">'
+      + '  <div class="team-fave-label">5 Favorite Things About Life</div>'
+      + favesHTML
+      + '</div>';
+  }).join('');
+})();
+
+/* ================= MODAL ================= */
+
+(function modal(){
+  var overlay = document.getElementById('modalOverlay');
+  var titleEl = document.getElementById('modalTitle');
+  var bodyEl = document.getElementById('modalBody');
+  var lastFocused = null;
+
+  function open(key){
+    var data = MODAL_CONTENT[key];
+    if (!data) return;
+    titleEl.textContent = data.title;
+    bodyEl.innerHTML = data.body + (data.cite ? '<p class="modal-cite mono small">' + data.cite + '</p>' : '');
+    lastFocused = document.activeElement;
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('modalClose').focus();
+  }
+  function close(){
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('[data-modal]');
+    if (trigger) { open(trigger.getAttribute('data-modal')); return; }
+    if (e.target === overlay || e.target.closest('[data-modal-close]')) close();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') close();
+  });
+})();
+
+})();
+</script>
+<script src="cursor.js" defer></script>
+</body>
+</html>
